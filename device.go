@@ -7,6 +7,8 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"regexp"
+	"strconv"
 )
 
 type Device struct {
@@ -19,7 +21,6 @@ type DeviceInfo struct {
 	MacAddress      string `xml:"macAddress" json:"mac-address"`
 	FirmwareVersion string `xml:"firmwareVersion" json:"firmware-version"`
 	SerialNumber    string `xml:"serialNumber" json:"serial-number"`
-	BinaryState     int    `xml:"binaryState" json:"binary-state"`
 }
 
 type BelkinResponse struct {
@@ -45,7 +46,40 @@ func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 		return nil, err
 	}
 
+	fmt.Printf("%+v\n", resp.Device)
+
 	return &resp.Device, nil
+}
+
+func (self *Device) FetchBinaryState() int {
+	message := newGetBinaryStateMessage()
+	response, err := post(self.Host, "GetBinaryState", message)
+	if err != nil {
+		log.Printf("unable to fetch BinaryState => %s\n", err)
+		return -1
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		log.Printf("GetBinaryState returned status code => %d\n", response.StatusCode)
+		return -1
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Printf("unable to read data => %s\n", err)
+		return -1
+	}
+
+	re := regexp.MustCompile(`.*<BinaryState>(\d+)</BinaryState>.*`)
+	matches := re.FindStringSubmatch(string(data))
+	if len(matches) != 2 {
+		log.Printf("unable to find BinaryState response in message => %s\n", string(data))
+		return -1
+	}
+
+	result, _ := strconv.Atoi(matches[1])
+	return result
 }
 
 func (self *Device) Off() {
@@ -57,17 +91,17 @@ func (self *Device) On() {
 }
 
 func (self *Device) Toggle() {
-	deviceInfo, err := self.FetchDeviceInfo()
-	if err == nil {
-		newState := deviceInfo.BinaryState == 0
-		self.changeState(newState)
+	if binaryState := self.FetchBinaryState(); binaryState == 0 {
+		self.On()
+	} else {
+		self.Off()
 	}
 }
 
 func (self *Device) changeState(newState bool) error {
 	fmt.Printf("changeState(%v)\n", newState)
 	message := newSetBinaryStateMessage(newState)
-	response, err := post(self.Host, message)
+	response, err := post(self.Host, "SetBinaryState", message)
 	if err != nil {
 		log.Printf("unable to post message, %s\n", err.Error())
 		return err

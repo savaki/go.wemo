@@ -1,20 +1,31 @@
 package wemo
 
 import (
-	"fmt"
+	// "fmt"
 	"testing"
 	"time"
 )
 
 func TestSample(t *testing.T) {
 	// device := &Device{Host: "10.0.1.32:49153"}
-	// device := &Device{Host: "10.0.1.19:49153"}
-	// device.On()
-	api, _ := NewByInterface("en0")
-	devices, _ := api.FindAll(3 * time.Second)
-	for _, device := range devices {
-		fmt.Printf(">> %+v\n", device)
-	}
+	device := &Device{Host: "10.0.1.19:49153"}
+
+	device.Toggle()
+	<-time.After(1 * time.Second)
+
+	device.Toggle()
+	<-time.After(1 * time.Second)
+
+	device.Toggle()
+	<-time.After(1 * time.Second)
+
+	device.Toggle()
+	<-time.After(1 * time.Second)
+	// api, _ := NewByInterface("en0")
+	// devices, _ := api.FindAll(3 * time.Second)
+	// for _, device := range devices {
+	// 	fmt.Printf(">> %+v\n", device)
+	// }
 }
 
 func TestRENoMatch(t *testing.T) {

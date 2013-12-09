@@ -1,6 +1,10 @@
 wemo
 ====
 
+Simple package to interface with Belkin wemo devices.
+
+### Example - Device discovery
+
 ```
 package main
 
@@ -19,20 +23,29 @@ func main() {
 }
 ```
 
+### Example - Control a device
+
 ```
 package main
 
 import (
-	"fmt"
-	"github.com/savaki/wemo"
+  "fmt"
+  "github.com/savaki/wemo"
 )
 
 func main() {
-  device     := &Device{Host:"10.0.1.32:49153"}
-  deviceInfo := device.FetchDeviceInfo()
+  // you can either create a device directly OR use the
+  // #Discover/#DiscoverAll methods to find devices
+  device        := &wemo.Device{Host:"10.0.1.32:49153"}
+
+  // retrieve device info
+  deviceInfo, _ := device.FetchDeviceInfo()
   fmt.Printf("Found => %+v\n", deviceInfo)
 
+  // device controls
   device.On()
   device.Off()
+  device.Toggle()
+  device.BinaryState() // returns 0 or 1
 }
 ```
