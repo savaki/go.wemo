@@ -7,6 +7,8 @@ import (
 	"regexp"
 )
 
+var ipAddrRE = regexp.MustCompile(`^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/\d{1,3}$`)
+
 func NewByIp(ipAddr string) *Wemo {
 	return &Wemo{ipAddr: ipAddr, Debug: false}
 }
@@ -28,9 +30,8 @@ func NewByInterface(name string) (*Wemo, error) {
 	}
 
 	// and find the one that looks like an IPv4 address
-	re, err := regexp.Compile(`^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/\d{1,3}$`)
 	for _, addr := range addrs {
-		if matches := re.FindStringSubmatch(addr.String()); len(matches) == 2 {
+		if matches := ipAddrRE.FindStringSubmatch(addr.String()); len(matches) == 2 {
 			return NewByIp(matches[1]), nil
 		}
 	}

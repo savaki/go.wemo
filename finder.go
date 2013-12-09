@@ -1,14 +1,11 @@
 package wemo
 
 import (
-	"fmt"
-	"io/ioutil"
-	"log"
 	"regexp"
 	"time"
 )
 
-var re *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
 
 type Wemo struct {
 	ipAddr string
@@ -36,7 +33,7 @@ func (self *Wemo) Find(urn string, timeout time.Duration) ([]*Device, error) {
 
 	var devices []*Device
 	for _, uri := range locations {
-		if matches := re.FindStringSubmatch(uri.String()); len(matches) == 2 {
+		if matches := belkinRE.FindStringSubmatch(uri.String()); len(matches) == 2 {
 			device := &Device{matches[1]}
 			devices = append(devices, device)
 		}

@@ -27,12 +27,6 @@ type BelkinResponse struct {
 }
 
 func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
-	matches := re.FindStringSubmatch(self.Host)
-	if len(matches) != 2 {
-		gripe := fmt.Sprintf("%s does not appear to be a belkin device, skipping", self.Host)
-		return nil, errors.New(gripe)
-	}
-
 	uri := fmt.Sprintf("http://%s/setup.xml", self.Host)
 	response, err := http.Get(uri)
 	if err != nil {

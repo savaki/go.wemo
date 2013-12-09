@@ -21,7 +21,7 @@ func TestRENoMatch(t *testing.T) {
 	var url = "http://10.0.11:80/description.xml"
 
 	// When
-	matches := re.FindStringSubmatch(url)
+	matches := belkinRE.FindStringSubmatch(url)
 
 	// Then
 	if len(matches) != 0 {
@@ -33,7 +33,7 @@ func TestREMatch(t *testing.T) {
 	var url = "http://10.0.1.17:49153/setup.xml"
 
 	// When
-	matches := re.FindStringSubmatch(url)
+	matches := belkinRE.FindStringSubmatch(url)
 
 	// Then
 	if len(matches) != 2 {
