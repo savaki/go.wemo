@@ -15,18 +15,6 @@ type Wemo struct {
 
 var re *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
 
-func Foo(name string) {
-	body := newSetBinaryStateMessage(false)
-	response, err := post("10.0.1.32:49153", body)
-	if err != nil {
-		log.Fatalf("unable to execute request => %s\n", err.Error())
-	}
-	defer response.Body.Close()
-	fmt.Printf("response code => %d\n", response.StatusCode)
-	contents, err := ioutil.ReadAll(response.Body)
-	fmt.Println(string(contents))
-}
-
 func (self *Wemo) FindAll(timeout time.Duration) ([]*Device, error) {
 	var all []*Device
 	urns := []string{"urn:Belkin:device:controllee:1", "urn:Belkin:device:light:1", "urn:Belkin:device:sensor:1"}
