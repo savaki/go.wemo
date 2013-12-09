@@ -58,7 +58,6 @@ As a convenience method, you can control lights through a more generic interface
 package main
 
 import (
-  "fmt"
   "github.com/savaki/wemo"
   "time"
 )
