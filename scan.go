@@ -75,6 +75,7 @@ func (self *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 				locations[temp] = u
 			}
 		}
+
 		if self.Debug {
 			log.Printf("Read : %v\n", string(buffer[:n]))
 		}

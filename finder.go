@@ -8,12 +8,12 @@ import (
 	"time"
 )
 
+var re *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+
 type Wemo struct {
 	ipAddr string
 	Debug  bool
 }
-
-var re *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
 
 func (self *Wemo) FindAll(timeout time.Duration) ([]*Device, error) {
 	var all []*Device
