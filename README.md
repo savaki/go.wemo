@@ -49,3 +49,24 @@ func main() {
   device.BinaryState() // returns 0 or 1
 }
 ```
+
+### Example - Control a named light
+
+As a convenience method, you can control lights through a more generic interface.
+
+```
+package main
+
+import (
+  "fmt"
+  "github.com/savaki/wemo"
+  "time"
+)
+
+func main() {
+  api, _ := wemo.NewByInterface("en0")
+  api.On("Left Light", 3*time.Second)
+  api.Off("Left Light", 3*time.Second)
+  api.Toggle("Left Light", 3*time.Second)
+}
+```
