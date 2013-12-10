@@ -103,7 +103,7 @@ func (self *Device) changeState(newState bool) error {
 	message := newSetBinaryStateMessage(newState)
 	response, err := post(self.Host, "SetBinaryState", message)
 	if err != nil {
-		log.Println("unable to post message, " + err.Error())
+		log.Println(err.Error())
 		return err
 	}
 	defer response.Body.Close()
