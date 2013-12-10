@@ -103,7 +103,7 @@ func (self *Device) changeState(newState bool) error {
 	message := newSetBinaryStateMessage(newState)
 	response, err := post(self.Host, "SetBinaryState", message)
 	if err != nil {
-		log.Printf("unable to post message, %+v\n", err)
+		log.Println("unable to post message, " + err.Error())
 		return err
 	}
 	defer response.Body.Close()
@@ -111,7 +111,7 @@ func (self *Device) changeState(newState bool) error {
 	if response.StatusCode != 200 {
 		data, err := ioutil.ReadAll(response.Body)
 		if err != nil {
-			log.Printf("couldn't read body from message => %s\n", err.Error())
+			log.Println("couldn't read body from message => " + err.Error())
 			return err
 		}
 		content := string(data)
