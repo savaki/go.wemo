@@ -50,7 +50,7 @@ func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 	return &resp.Device, nil
 }
 
-func (self *Device) FetchBinaryState() int {
+func (self *Device) GetBinaryState() int {
 	message := newGetBinaryStateMessage()
 	response, err := post(self.Host, "GetBinaryState", message)
 	if err != nil {
@@ -90,7 +90,7 @@ func (self *Device) On() {
 }
 
 func (self *Device) Toggle() {
-	if binaryState := self.FetchBinaryState(); binaryState == 0 {
+	if binaryState := self.GetBinaryState(); binaryState == 0 {
 		self.On()
 	} else {
 		self.Off()
