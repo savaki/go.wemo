@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-func TestSample(t *testing.T) {
+func TestDisoverAll(t *testing.T) {
 	// device := &Device{Host: "10.0.1.32:49153"}
 	// device := &Device{Host: "10.0.1.19:49153"}
 
