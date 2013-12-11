@@ -5,12 +5,12 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
+	"time"
 )
 
 func post(hostAndPort, action, body string) (*http.Response, error) {
-	tcpConn, err := net.Dial("tcp", hostAndPort)
+	tcpConn, err := timeoutDialer(2*time.Second, 2*time.Second)("tcp", hostAndPort)
 	if err != nil {
 		return nil, err
 	}

@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"net/http"
 	"regexp"
 	"strconv"
 )
@@ -29,7 +28,7 @@ type BelkinResponse struct {
 
 func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 	uri := fmt.Sprintf("http://%s/setup.xml", self.Host)
-	response, err := http.Get(uri)
+	response, err := client.Get(uri)
 	if err != nil {
 		return nil, err
 	}
