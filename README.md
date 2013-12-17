@@ -1,6 +1,8 @@
 wemo
 ====
 
+[![GoDoc](http://godoc.org/github.com/savaki/wemo?status.png)](http://godoc.org/github.com/savaki/wemo)
+
 Simple package to interface with Belkin wemo devices.
 
 ### Example - Device discovery
