@@ -48,7 +48,7 @@ func main() {
   device.On()
   device.Off()
   device.Toggle()
-  device.BinaryState() // returns 0 or 1
+  device.GetBinaryState() // returns 0 or 1
 }
 ```
 
