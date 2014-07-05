@@ -22,7 +22,7 @@ import(
   "encoding/xml"
 )
 
-
+// Structure for XML to Parse to
 type Deviceevent struct {
   XMLName xml.Name `xml:"propertyset"`
   BinaryState string `xml:"property>BinaryState"`
@@ -36,11 +36,10 @@ func Listener(listenerAddress string){
   
   http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request){
     
-    fmt.Println("-------------------------")
     eventxml := Deviceevent{}
     
     if r.Method == "NOTIFY" {
-      
+      //This will be delt with when I work out how to handle events
       fmt.Println("SID: ", r.Header.Get("Sid"))
       fmt.Println("Host: ", r.Host)
       fmt.Println("Content-Type: ", r.Header.Get("Content-Type"))
@@ -51,16 +50,14 @@ func Listener(listenerAddress string){
         
         err := xml.Unmarshal([]byte(body), &eventxml)
         if err != nil {
-        	fmt.Printf("Unmarshal error: %v", err)
+        	fmt.Println("Unmarshal error: ", err)
         	return
         }
         
+        //Need to work out how to handle events....
         fmt.Println("BinaryState: ", eventxml.BinaryState)
-       
       }
-      
     } 
-    
   })
   
   http.ListenAndServe(listenerAddress, nil)
