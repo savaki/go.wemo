@@ -65,7 +65,7 @@ func Listener(listenerAddress string){
 
 // Subscribe to the device event emitter, return the Subscription ID (sid) and StatusCode
 func (self *Device) Subscribe(listenerAddress string) (string, int) {
-  
+
   host := self.Host 
   
   address := fmt.Sprintf("http://%s/upnp/event/basicevent1", host)
@@ -90,9 +90,10 @@ func (self *Device) Subscribe(listenerAddress string) (string, int) {
     log.Fatal("Client Request Error: ", err)
   }
   defer resp.Body.Close()
-  
+   
   if resp.StatusCode == 200 {
     fmt.Println("Subscription Successful: ", resp.StatusCode)
+    resp.Body.Close()     
     return resp.Header.Get("Sid"), resp.StatusCode
   } else if resp.StatusCode == 400 {
     fmt.Println("Subscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
@@ -102,6 +103,7 @@ func (self *Device) Subscribe(listenerAddress string) (string, int) {
     fmt.Println("Subscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
   }
 
+  resp.Body.Close() 
   return "", resp.StatusCode  
   
 }
