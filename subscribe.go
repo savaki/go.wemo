@@ -7,53 +7,63 @@ package wemo
   2. Send a subscribe message to 
     deviceIP:devicePort/upnp/event/basicevent1
   3. If the responce is 200, the subscription is successful and ...
+
   4. ... thus it should be added to the subscribed device list
   5. When state is emitted record state changes
-  6. Should then send a 200 status response?
   
 */
 
+
 import(
-  "net"
   "fmt"
-  "io"
   "log"
   "net/http"
+  "io/ioutil"
+  "encoding/xml"
 )
 
 
+type Deviceevent struct {
+  XMLName xml.Name `xml:"propertyset"`
+  BinaryState string `xml:"property>BinaryState"`
+}
+
+
+// Listen for incomming subscribed state changes.
 func Listener(listenerAddress string){
   
   fmt.Println("Listening... ", listenerAddress)
- 
-	listener, err := net.Listen("tcp", listenerAddress)
-	if err != nil {
-		log.Fatal("Listen Err: ", err)
-    return
-	}
   
-	//defer listener.Close()
+  http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request){
+    
+    fmt.Println("-------------------------")
+    eventxml := Deviceevent{}
+    
+    if r.Method == "NOTIFY" {
+      
+      fmt.Println("SID: ", r.Header.Get("Sid"))
+      fmt.Println("Host: ", r.Host)
+      fmt.Println("Content-Type: ", r.Header.Get("Content-Type"))
+      fmt.Println("Seq: ", r.Header.Get("Seq"))
+      
+      body, err := ioutil.ReadAll(r.Body)
+      if err == nil {
+        
+        err := xml.Unmarshal([]byte(body), &eventxml)
+        if err != nil {
+        	fmt.Printf("Unmarshal error: %v", err)
+        	return
+        }
+        
+        fmt.Println("BinaryState: ", eventxml.BinaryState)
+       
+      }
+      
+    } 
+    
+  })
   
-	for {
-    
-		// Wait for a connection.
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Fatal(err)
-		}
-    
-    fmt.Println(conn)
-    
-		// Handle the connection in a new goroutine.
-		// The loop then returns to accepting, so that
-		// multiple connections may be served concurrently.
-		go func(c net.Conn) {
-			// Echo all incoming data.
-			fmt.Println(io.Copy(c, c))
-			// Shut down the connection.
-			c.Close()
-		}(conn)
-	}
+  http.ListenAndServe(listenerAddress, nil)
 }
 
 // Subscribe to the device event emitter, return the Subscription ID (sid) and StatusCode
