@@ -71,3 +71,48 @@ func main() {
   api.Toggle("Left Light", 3*time.Second)
 }
 ```
+
+###Example - Managing Subscriptions
+
+This is a work in progress (I am learning Go ;-\)
+
+
+```
+package main
+
+import (
+	"fmt"
+	"github.com/savaki/go.wemo"
+	"time"
+)
+
+func main() {
+  
+  listenerAddress := "192.168.0.6:6767"
+  timeout := 300
+  
+  api, _ := wemo.NewByInterface("en0")
+  
+  devices, _ := api.DiscoverAll(3*time.Second)
+  
+  subscriptions := make(map[string]wemo.SubscriptionInfo)
+  
+  for _, device := range devices {
+    
+    info, _ := device.FetchDeviceInfo()
+    id, err := device.Subscribe(listenerAddress, timeout)
+    if err == 200 {
+      subscriptions[device.Host] = wemo.SubscriptionInfo{*info, "0", timeout, id }      
+    }
+  }
+  
+  wemo.Listener(listenerAddress)
+   
+  fmt.Println("Subscription List: ", subscriptions)
+  
+}
+
+```
+
+
+
