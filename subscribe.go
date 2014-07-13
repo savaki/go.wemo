@@ -9,9 +9,7 @@ package wemo
   3. If the responce is 200, the subscription is successful and ...
   4. ... thus it should be added to the subscribed device list
   5. Subscriptions should be renewed around the timeout period
-
-Need to decide how to handle things next...
-  6. When state is emitted record state changes
+  6. When state is emitted record state changes against the subscription id (SID)
 
 */
 
@@ -40,8 +38,14 @@ type Deviceevent struct {
 	BinaryState string   `xml:"property>BinaryState"`
 }
 
+// Structure for XML to Parse to
+type SubscriptionEvent struct {
+	Sid string
+	State string
+}
+
 // Listen for incomming subscribed state changes.
-func Listener(listenerAddress string, cs chan string) {
+func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 
 	fmt.Println("Listening... ", listenerAddress)
 
@@ -58,10 +62,8 @@ func Listener(listenerAddress string, cs chan string) {
 					fmt.Println("Unmarshal error: ", err)
 					return
 				}
-
-				//Need to work out how to handle events....
-        //r.Header.Get("Sid") //eventxml.BinaryState
-        cs <- eventxml.BinaryState
+        
+        cs <- SubscriptionEvent {r.Header.Get("Sid"), eventxml.BinaryState}
 			}
 		}
 	})

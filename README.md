@@ -74,8 +74,7 @@ func main() {
 
 ###Example - Managing Subscriptions
 
-This is a work in progress (I am learning Go ;-\)
-
+This is an example of discovering devices, subscribing to there events and being notified of changed to there state. Resubscriptions and managed automatically at the timeout specified. Subscriber details and state are maintained in a map.
 
 ```
 package main
@@ -95,22 +94,23 @@ func main() {
   
   devices, _ := api.DiscoverAll(3*time.Second)
   
-  subscriptions := make(map[string]wemo.SubscriptionInfo)
+  subscriptions := make(map[string]*wemo.SubscriptionInfo)
   
   for _, device := range devices {
     info, _ := device.FetchDeviceInfo()
     id, err := device.ManageSubscription(listenerAddress, timeout)
     if err == 200 {
-      subscriptions[device.Host] = wemo.SubscriptionInfo{*info, "0", timeout, id }      
+      subscriptions[id] = &wemo.SubscriptionInfo{*info, "0", timeout, id, device.Host}      
     }
   }
   
-  cs := make(chan string)
+  cs := make(chan wemo.SubscriptionEvent)
 
   go wemo.Listener(listenerAddress, cs)
   
   for m := range cs{
-    fmt.Println("---Sid:", m, ", ", subscriptions[m].State)
+    subscriptions[m.Sid].State = m.State
+    fmt.Println("---Subscriber Event: ", subscriptions[m.Sid])
   }
   
 }
