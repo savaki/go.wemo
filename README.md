@@ -98,17 +98,20 @@ func main() {
   subscriptions := make(map[string]wemo.SubscriptionInfo)
   
   for _, device := range devices {
-    
     info, _ := device.FetchDeviceInfo()
-    id, err := device.Subscribe(listenerAddress, timeout)
+    id, err := device.ManageSubscription(listenerAddress, timeout)
     if err == 200 {
       subscriptions[device.Host] = wemo.SubscriptionInfo{*info, "0", timeout, id }      
     }
   }
   
-  wemo.Listener(listenerAddress)
-   
-  fmt.Println("Subscription List: ", subscriptions)
+  cs := make(chan string)
+
+  go wemo.Listener(listenerAddress, cs)
+  
+  for m := range cs{
+    fmt.Println("---Sid:", m, ", ", subscriptions[m].State)
+  }
   
 }
 

@@ -8,9 +8,10 @@ package wemo
     deviceIP:devicePort/upnp/event/basicevent1
   3. If the responce is 200, the subscription is successful and ...
   4. ... thus it should be added to the subscribed device list
+  5. Subscriptions should be renewed around the timeout period
 
 Need to decide how to handle things next...
-  5. When state is emitted record state changes
+  6. When state is emitted record state changes
 
 */
 
@@ -20,10 +21,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+  "time"
 )
 
-// Subscriptions Structure
-//var Subscriptions map[string]SubscriptionInfo
 
 // Device and Subscription Info
 type SubscriptionInfo struct {
@@ -31,8 +31,8 @@ type SubscriptionInfo struct {
   State string
   Timeout int
   Sid string
+  Host string
 }
-
 
 // Structure for XML to Parse to
 type Deviceevent struct {
@@ -41,7 +41,7 @@ type Deviceevent struct {
 }
 
 // Listen for incomming subscribed state changes.
-func Listener(listenerAddress string) {
+func Listener(listenerAddress string, cs chan string) {
 
 	fmt.Println("Listening... ", listenerAddress)
 
@@ -50,11 +50,6 @@ func Listener(listenerAddress string) {
 		eventxml := Deviceevent{}
 
 		if r.Method == "NOTIFY" {
-			//This will be delt with when I work out how to handle events
-			fmt.Println("SID: ", r.Header.Get("Sid"))
-			fmt.Println("Host: ", r.Host)
-			fmt.Println("Content-Type: ", r.Header.Get("Content-Type"))
-			fmt.Println("Seq: ", r.Header.Get("Seq"))
 
 			body, err := ioutil.ReadAll(r.Body)
 			if err == nil {
@@ -65,12 +60,49 @@ func Listener(listenerAddress string) {
 				}
 
 				//Need to work out how to handle events....
-				fmt.Println("BinaryState: ", eventxml.BinaryState)
+        //r.Header.Get("Sid") //eventxml.BinaryState
+        cs <- eventxml.BinaryState
 			}
 		}
 	})
 
-	http.ListenAndServe(listenerAddress, nil)
+	err := http.ListenAndServe(listenerAddress, nil)
+  if err != nil {
+    fmt.Println("From Listen and Serve an Err! ", err)
+  }
+}
+
+// Manage firstly the subscription and then the resubscription of this device.
+func (self *Device) ManageSubscription(listenerAddress string, timeout int) (string, int){
+  /*  Subscribe to the device.
+      Once the device has a SID, it should have resubscriptions requested before the timeout.
+      Should a resubscription fail, an attempt should be made to unsubscribe and 
+      then subscribe to the device in question. Returning the new SID or an error
+  */
+  
+  id, err := self.Subscribe(listenerAddress, timeout)
+  if err != 200 {
+    fmt.Println("Error with initial subscription: ", err)
+    return "", err
+  }
+  
+  timer := time.NewTimer(time.Second * time.Duration(timeout))
+  go func() (string, int){
+    for _ = range timer.C {
+      timer.Reset(time.Second * time.Duration(timeout))
+  
+      // Should really do something with the SID returned to check it has not changed
+      _, err := self.ReSubscribe(id, timeout)
+      if err != 200 {
+        fmt.Println("Error with resubscription: ", err)
+        return "", err
+      }
+    }
+    return "", err
+  }()
+  
+  return id, err
+  
 }
 
 // Subscribe to the device event emitter, return the Subscription ID (sid) and StatusCode
@@ -96,6 +128,8 @@ func (self *Device) Subscribe(listenerAddress string, timeout int) (string, int)
 	req.Header.Add("callback", fmt.Sprintf("<http://%s/listener>", listenerAddress))
 	req.Header.Add("nt", "upnp:event")
 	req.Header.Add("timeout", fmt.Sprintf("Second-%d", timeout))
+  
+  req.Close = true
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -105,7 +139,7 @@ func (self *Device) Subscribe(listenerAddress string, timeout int) (string, int)
 
 	if resp.StatusCode == 200 {
 		fmt.Println("Subscription Successful: ", resp.StatusCode)
-		resp.Body.Close()
+		//resp.Body.Close()
 		return resp.Header.Get("Sid"), resp.StatusCode
 	} else if resp.StatusCode == 400 {
 		fmt.Println("Subscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
@@ -115,7 +149,7 @@ func (self *Device) Subscribe(listenerAddress string, timeout int) (string, int)
 		fmt.Println("Subscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
 	}
 
-	resp.Body.Close()
+	//resp.Body.Close()
 	return "", resp.StatusCode
 
 }
@@ -136,6 +170,8 @@ func (self *Device) UnSubscribe(sid string) int {
 
 	req.Header.Add("host", fmt.Sprintf("http://%s", host))
 	req.Header.Add("SID", sid)
+  
+  req.Close = true
 
 	resp, err := client.Do(req)
 	if err != nil {
@@ -153,14 +189,14 @@ func (self *Device) UnSubscribe(sid string) int {
 		fmt.Println("Unsubscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
 	}
 
-	resp.Body.Close()
+	//resp.Body.Close()
 	return resp.StatusCode
 
 }
 
 // The subscription to the device must be renewed before the timeout. Return the Subscription ID (sid) and StatusCode
 func (self *Device) ReSubscribe(sid string, timeout int) (string, int) {
-
+  
 	host := self.Host
 
 	address := fmt.Sprintf("http://%s/upnp/event/basicevent1", host)
@@ -180,25 +216,28 @@ func (self *Device) ReSubscribe(sid string, timeout int) (string, int) {
 	req.Header.Add("SID", sid)
 	req.Header.Add("timeout", fmt.Sprintf("Second-%d", timeout))
 
+  req.Close = true
+  
 	resp, err := client.Do(req)
 	if err != nil {
+    fmt.Println("Response: ", self.Host, resp)
 		log.Fatal("Client Request Error: ", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		fmt.Println("Unsubscription Successful: ", resp.StatusCode)
-		resp.Body.Close()
+		fmt.Println("Resubscription Successful: ", resp.StatusCode)
+		//resp.Body.Close()
 		return resp.Header.Get("Sid"), resp.StatusCode
 	} else if resp.StatusCode == 400 {
-		fmt.Println("Unsubscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
+		fmt.Println("Resubscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
 	} else if resp.StatusCode == 412 {
-		fmt.Println("Unsubscription Unsuccessful, Precondition Failed: ", resp.StatusCode)
+		fmt.Println("Resubscription Unsuccessful, Precondition Failed: ", resp.StatusCode)
 	} else {
-		fmt.Println("Unsubscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
+		fmt.Println("Resubscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
 	}
 
-	resp.Body.Close()
+	//resp.Body.Close()
 	return "", resp.StatusCode
 
 }
