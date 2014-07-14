@@ -45,7 +45,7 @@ func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 		return nil, err
 	}
 
-	fmt.Printf("%+v\n", resp.Device)
+	log.Printf("%+v\n", resp.Device)
 
 	return &resp.Device, nil
 }
@@ -98,7 +98,7 @@ func (self *Device) Toggle() {
 }
 
 func (self *Device) changeState(newState bool) error {
-	fmt.Printf("changeState(%v)\n", newState)
+	//fmt.Printf("changeState(%v)\n", newState)
 	message := newSetBinaryStateMessage(newState)
 	response, err := post(self.Host, "SetBinaryState", message)
 	if err != nil {
