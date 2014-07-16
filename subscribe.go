@@ -20,13 +20,14 @@ import (
 	"log"
 	"net/http"
   "time"
+  "strconv"
 )
 
 
 // Device and Subscription Info
 type SubscriptionInfo struct {
   DeviceInfo
-  State string
+  State bool
   Timeout int
   Sid string
   Host string
@@ -41,7 +42,7 @@ type Deviceevent struct {
 // Structure for sending subscribed event data with
 type SubscriptionEvent struct {
 	Sid string
-	State string
+	State bool
 }
 
 // Listen for incomming subscribed state changes.
@@ -57,13 +58,19 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 
 			body, err := ioutil.ReadAll(r.Body)
 			if err == nil {
+        
 				err := xml.Unmarshal([]byte(body), &eventxml)
 				if err != nil {
+          
 					log.Println("Unmarshal error: ", err)
 					return
 				}
         
-        cs <- SubscriptionEvent {r.Header.Get("Sid"), eventxml.BinaryState}
+        b, err := strconv.ParseBool(eventxml.BinaryState)
+        if err == nil {
+          cs <- SubscriptionEvent {r.Header.Get("Sid"), b}
+        }
+        
 			}
 		}
 	})
@@ -75,31 +82,55 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 }
 
 // Manage firstly the subscription and then the resubscription of this device.
-func (self *Device) ManageSubscription(listenerAddress string, timeout int) (string, int){
-  /*  Subscribe to the device.
+func (self *Device) ManageSubscription(listenerAddress string, timeout int, subscriptions map[string]*SubscriptionInfo) (string, int){
+  /*  Subscribe to the device. Add device to subscriptions list
   
       Once the device has a SID, it should have resubscriptions requested before the timeout.
   
       Should a resubscription fail, an attempt should be made to unsubscribe and 
       then subscribe to the device in question. Returning the new SID or an error
+      
+      The new SID should be updated in the subscription list and the old item removed.
   */
+ 
+  // Initial Subscribe
+  info, _ := self.FetchDeviceInfo()
   
   id, err := self.Subscribe(listenerAddress, timeout)
   if err != 200 {
     log.Println("Error with initial subscription: ", err)
     return "", err
+  } else {
+    subscriptions[id] = &SubscriptionInfo{*info, false, timeout, id, self.Host}      
   }
   
+  // Setup resubscription timer
   timer := time.NewTimer(time.Second * time.Duration(timeout))
   go func() (string, int){
     for _ = range timer.C {
       timer.Reset(time.Second * time.Duration(timeout))
-  
-      // Should really do something with the SID returned to check it has not changed
+      
+      // Resubscribe
       _, err := self.ReSubscribe(id, timeout)
       if err != 200 {
-        log.Println("Error with resubscription: ", err)
-        return "", err
+        
+        // Failed to resubscribe so try unsubscribe, it is likely to fail but don't care.
+        self.UnSubscribe(id)
+        
+        // Setup a new subscription, if this fails, next attempt will be when timer triggers again
+        newId, err := self.Subscribe(listenerAddress, timeout)
+        if err != 200 {
+          log.Println("Error with subscription attempt: ", err)
+        } else { 
+          // If the subscription is successful. Check if the new SID exists and if not remove it. Then add the new SID
+          _, ok := subscriptions[newId]
+          if ok == false {
+            delete(subscriptions, id)
+          }
+          subscriptions[newId] = &SubscriptionInfo{*info, false, timeout, newId, self.Host} 
+          id = newId
+        }
+        
       }
     }
     return "", err
@@ -142,14 +173,14 @@ func (self *Device) Subscribe(listenerAddress string, timeout int) (string, int)
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-    //log.Println("Subscription Successful: ", resp.StatusCode)
+    log.Println("Subscription Successful: ", self.Host, resp.StatusCode)
 		return resp.Header.Get("Sid"), resp.StatusCode
 	} else if resp.StatusCode == 400 {
-		log.Println("Subscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
+		log.Println("Subscription Unsuccessful, Incompatible header fields: ", self.Host, resp.StatusCode)
 	} else if resp.StatusCode == 412 {
-		log.Println("Subscription Unsuccessful, Precondition Failed: ", resp.StatusCode)
+		log.Println("Subscription Unsuccessful, Precondition Failed: ", self.Host, resp.StatusCode)
 	} else {
-		log.Println("Subscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
+		log.Println("Subscription Unsuccessful, Unable to accept renewal: ", self.Host, resp.StatusCode)
 	}
 
 	return "", resp.StatusCode
@@ -182,13 +213,13 @@ func (self *Device) UnSubscribe(sid string) int {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-    //log.Println("Unsubscription Successful: ", resp.StatusCode)
+    log.Println("Unsubscription Successful: ", self.Host, resp.StatusCode)
 	} else if resp.StatusCode == 400 {
-		log.Println("Unsubscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
+		log.Println("Unsubscription Unsuccessful, Incompatible header fields: ", self.Host, resp.StatusCode)
 	} else if resp.StatusCode == 412 {
-		log.Println("Unsubscription Unsuccessful, Precondition Failed: ", resp.StatusCode)
+		log.Println("Unsubscription Unsuccessful, Precondition Failed: ", self.Host, resp.StatusCode)
 	} else {
-		log.Println("Unsubscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
+		log.Println("Unsubscription Unsuccessful, Unable to accept renewal: ", self.Host, resp.StatusCode)
 	}
 
 	return resp.StatusCode
@@ -229,11 +260,11 @@ func (self *Device) ReSubscribe(sid string, timeout int) (string, int) {
     //log.Println("Resubscription Successful: ", resp.StatusCode)
 		return resp.Header.Get("Sid"), resp.StatusCode
 	} else if resp.StatusCode == 400 {
-		log.Println("Resubscription Unsuccessful, Incompatible header fields: ", resp.StatusCode)
+		log.Println("Resubscription Unsuccessful, Incompatible header fields: ", self.Host, resp.StatusCode)
 	} else if resp.StatusCode == 412 {
-		log.Println("Resubscription Unsuccessful, Precondition Failed: ", resp.StatusCode)
+		log.Println("Resubscription Unsuccessful, Precondition Failed: ", self.Host, resp.StatusCode)
 	} else {
-		log.Println("Resubscription Unsuccessful, Unable to accept renewal: ", resp.StatusCode)
+		log.Println("Resubscription Unsuccessful, Unable to accept renewal: ", self.Host, resp.StatusCode)
 	}
 
 	return "", resp.StatusCode

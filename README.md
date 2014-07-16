@@ -80,9 +80,9 @@ This is an example of discovering devices, subscribing to there events and being
 package main
 
 import (
-	"fmt"
 	"github.com/savaki/go.wemo"
 	"time"
+  "log"
 )
 
 func main() {
@@ -93,28 +93,30 @@ func main() {
   api, _ := wemo.NewByInterface("en0")
   
   devices, _ := api.DiscoverAll(3*time.Second)
-  
+ 
   subscriptions := make(map[string]*wemo.SubscriptionInfo)
-  
+
   for _, device := range devices {
-    info, _ := device.FetchDeviceInfo()
-    id, err := device.ManageSubscription(listenerAddress, timeout)
-    if err == 200 {
-      subscriptions[id] = &wemo.SubscriptionInfo{*info, "0", timeout, id, device.Host}      
+    _, err := device.ManageSubscription(listenerAddress, timeout, subscriptions)
+    if err != 200 {
+      log.Println("Initial Error Subscribing: ", err)   
     }
   }
   
   cs := make(chan wemo.SubscriptionEvent)
 
   go wemo.Listener(listenerAddress, cs)
-  
-  for m := range cs{
-    subscriptions[m.Sid].State = m.State
-    fmt.Println("---Subscriber Event: ", subscriptions[m.Sid])
-  }
-  
-}
 
+  for m := range cs{
+    if _, ok := subscriptions[m.Sid]; ok {
+      subscriptions[m.Sid].State = m.State
+      log.Println("---Subscriber Event: ", subscriptions[m.Sid])
+    } else {
+      log.Println("Does'nt exist, ", m.Sid)
+    }
+  }
+
+}
 ```
 
 
