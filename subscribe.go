@@ -165,6 +165,8 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
+		//TODO:Check that this return is correct.
+		return "", 0
 	}
 	defer resp.Body.Close()
 
@@ -204,6 +206,8 @@ func (d *Device) UnSubscribe(sid string) int {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
+		//TODO:Check that this return is correct
+		return 0
 	}
 	defer resp.Body.Close()
 
@@ -247,6 +251,8 @@ func (d *Device) ReSubscribe(sid string, timeout int) (string, int) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
+		//TODO:Check that this return is correct
+		return "", 0
 	}
 	defer resp.Body.Close()
 
