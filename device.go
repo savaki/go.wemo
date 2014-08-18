@@ -45,7 +45,7 @@ func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 		return nil, err
 	}
 
-	log.Printf("%+v\n", resp.Device)
+	//log.Printf("%+v\n", resp.Device)
 
 	return &resp.Device, nil
 }

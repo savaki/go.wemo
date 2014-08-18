@@ -171,7 +171,7 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		log.Println("Subscription Successful: ", d.Host, resp.StatusCode)
+		//log.Println("Subscription Successful: ", d.Host, resp.StatusCode)
 		return resp.Header.Get("Sid"), resp.StatusCode
 	} else if resp.StatusCode == 400 {
 		log.Println("Subscription Unsuccessful, Incompatible header fields: ", d.Host, resp.StatusCode)
@@ -212,7 +212,7 @@ func (d *Device) UnSubscribe(sid string) int {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 200 {
-		log.Println("Unsubscription Successful: ", d.Host, resp.StatusCode)
+		//log.Println("Unsubscription Successful: ", d.Host, resp.StatusCode)
 	} else if resp.StatusCode == 400 {
 		log.Println("Unsubscription Unsuccessful, Incompatible header fields: ", d.Host, resp.StatusCode)
 	} else if resp.StatusCode == 412 {
