@@ -1,7 +1,9 @@
 go.wemo
 =======
 
-[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
+I submitted a pull request for the changes I have made to this library. The request is pending, so I have edited the infor below to reflect the location of this library.
+
+[![GoDoc](http://godoc.org/github.com/danward79/go.wemo?status.png)](http://godoc.org/github.com/danward79/go.wemo)
 
 Simple package to interface with Belkin wemo devices.
 
@@ -12,7 +14,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/savaki/go.wemo"
+	"github.com/danward79/go.wemo"
 	"time"
 )
 
@@ -32,7 +34,7 @@ package main
 
 import (
   "fmt"
-  "github.com/savaki/go.wemo"
+  "github.com/danward79/go.wemo"
 )
 
 func main() {
@@ -60,7 +62,7 @@ As a convenience method, you can control lights through a more generic interface
 package main
 
 import (
-  "github.com/savaki/go.wemo"
+  "github.com/danward79/go.wemo"
   "time"
 )
 
@@ -80,7 +82,7 @@ This is an example of discovering devices, subscribing to there events and being
 package main
 
 import (
-	"github.com/savaki/go.wemo"
+	"github.com/danward79/go.wemo"
 	"time"
   "log"
 )
