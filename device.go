@@ -32,16 +32,19 @@ type Device struct {
 }
 
 type DeviceInfo struct {
-	DeviceType      string `xml:"deviceType" json:"device-type"`
-	FriendlyName    string `xml:"friendlyName" json:"friendly-name"`
-	MacAddress      string `xml:"macAddress" json:"mac-address"`
-	FirmwareVersion string `xml:"firmwareVersion" json:"firmware-version"`
-	SerialNumber    string `xml:"serialNumber" json:"serial-number"`
+	Device          *Device `json:"-"`
+	DeviceType      string  `xml:"deviceType" json:"device-type"`
+	FriendlyName    string  `xml:"friendlyName" json:"friendly-name"`
+	MacAddress      string  `xml:"macAddress" json:"mac-address"`
+	FirmwareVersion string  `xml:"firmwareVersion" json:"firmware-version"`
+	SerialNumber    string  `xml:"serialNumber" json:"serial-number"`
 }
 
-type BelkinResponse struct {
-	Device DeviceInfo `xml:"device"`
-}
+type DeviceInfos []*DeviceInfo
+
+func (d DeviceInfos) Len() int           { return len(d) }
+func (d DeviceInfos) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+func (d DeviceInfos) Less(i, j int) bool { return d[i].FriendlyName < d[j].FriendlyName }
 
 func (d *Device) printf(format string, args ...interface{}) {
 	if d.Logger != nil {
@@ -58,15 +61,18 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 		return nil, err
 	}
 
-	resp := new(BelkinResponse)
-	err = xml.Unmarshal(data, resp)
+	resp := struct {
+		DeviceInfo DeviceInfo `xml:"device"`
+	}{}
+	err = xml.Unmarshal(data, &resp)
 	if err != nil {
 		return nil, err
 	}
 
-	d.printf("%+v\n", resp.Device)
+	d.printf("%+v\n", resp.DeviceInfo)
+	resp.DeviceInfo.Device = d
 
-	return &resp.Device, nil
+	return &resp.DeviceInfo, nil
 }
 
 func (d *Device) GetBinaryState() int {

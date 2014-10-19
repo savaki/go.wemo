@@ -1,9 +1,12 @@
 package main
 
 import (
+	"code.google.com/p/go.net/context"
+	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/savaki/go.wemo"
 	"log"
+	"sort"
 	"time"
 )
 
@@ -33,7 +36,35 @@ func commandAction(c *cli.Context) {
 		log.Fatal(err)
 	}
 
+	format := "%-20s %-20s %-21s %-20s\n"
+	fmt.Printf(format,
+		"Host",
+		"Friendly Name",
+		"Firmware Version",
+		"Serial Number",
+	)
+	fmt.Printf(format,
+		"----------------",
+		"----------------",
+		"----------------",
+		"----------------",
+	)
+
+	deviceInfos := wemo.DeviceInfos{}
 	for _, device := range devices {
-		log.Printf("%#v\n", device)
+		deviceInfo, err := device.FetchDeviceInfo(context.Background())
+		if err != nil {
+			log.Fatal(err)
+		}
+		deviceInfos = append(deviceInfos, deviceInfo)
+	}
+
+	sort.Sort(deviceInfos)
+	for _, deviceInfo := range deviceInfos {
+		fmt.Printf(format,
+			deviceInfo.Device.Host,
+			deviceInfo.FriendlyName,
+			deviceInfo.FirmwareVersion,
+			deviceInfo.SerialNumber)
 	}
 }
