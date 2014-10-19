@@ -15,29 +15,32 @@ package wemo
 
 import (
 	"fmt"
+	"os"
 	"testing"
 	"time"
 )
 
 func TestDisoverAll(t *testing.T) {
-	// device := &Device{Host: "10.0.1.32:49153"}
-	// device := &Device{Host: "10.0.1.19:49153"}
+	if os.Getenv("integration") != "" {
+		// device := &Device{Host: "10.0.1.32:49153"}
+		// device := &Device{Host: "10.0.1.19:49153"}
 
-	// device.Toggle()
-	// <-time.After(1 * time.Second)
+		// device.Toggle()
+		// <-time.After(1 * time.Second)
 
-	// device.Toggle()
-	// <-time.After(1 * time.Second)
+		// device.Toggle()
+		// <-time.After(1 * time.Second)
 
-	// device.Toggle()
-	// <-time.After(1 * time.Second)
+		// device.Toggle()
+		// <-time.After(1 * time.Second)
 
-	// device.Toggle()
-	// <-time.After(1 * time.Second)
-	api, _ := NewByInterface("en0")
-	devices, _ := api.DiscoverAll(3 * time.Second)
-	for _, device := range devices {
-		fmt.Printf(">> %+v\n", device)
+		// device.Toggle()
+		// <-time.After(1 * time.Second)
+		api, _ := NewByInterface("en0")
+		devices, _ := api.DiscoverAll(3 * time.Second)
+		for _, device := range devices {
+			fmt.Printf(">> %+v\n", device)
+		}
 	}
 }
 

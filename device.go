@@ -52,6 +52,18 @@ func (d *Device) printf(format string, args ...interface{}) {
 	}
 }
 
+func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
+	resp := struct {
+		DeviceInfo DeviceInfo `xml:"device"`
+	}{}
+	err := xml.Unmarshal(data, &resp)
+	if err != nil {
+		return nil, err
+	}
+
+	return &resp.DeviceInfo, nil
+}
+
 func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 	var data []byte
 
@@ -61,18 +73,13 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 		return nil, err
 	}
 
-	resp := struct {
-		DeviceInfo DeviceInfo `xml:"device"`
-	}{}
-	err = xml.Unmarshal(data, &resp)
+	deviceInfo, err := unmarshalDeviceInfo(data)
 	if err != nil {
 		return nil, err
 	}
 
-	d.printf("%+v\n", resp.DeviceInfo)
-	resp.DeviceInfo.Device = d
-
-	return &resp.DeviceInfo, nil
+	deviceInfo.Device = d
+	return deviceInfo, nil
 }
 
 func (d *Device) GetBinaryState() int {

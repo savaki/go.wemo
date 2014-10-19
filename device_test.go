@@ -15,7 +15,6 @@ package wemo
 
 import (
 	"encoding/json"
-	"encoding/xml"
 	"testing"
 )
 
@@ -126,11 +125,7 @@ func TestParseResponseXML(t *testing.T) {
 	`)
 
 	// When
-	response := new(BelkinResponse)
-	xml.Unmarshal(data, response)
-
-	// Then
-	deviceInfo := response.Device
+	deviceInfo, _ := unmarshalDeviceInfo(data)
 	assert(t, deviceInfo.DeviceType, "urn:Belkin:device:controllee:1")
 	assert(t, deviceInfo.FirmwareVersion, "WeMo_US_2.00.2769.PVT")
 	assert(t, deviceInfo.FriendlyName, "Pirate Light Right")
