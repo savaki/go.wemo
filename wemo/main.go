@@ -25,6 +25,9 @@ func main() {
 	app.Version = "0.1"
 	app.Commands = []cli.Command{
 		discoverCommand,
+		onCommand,
+		offCommand,
+		toggleCommand,
 	}
 	app.Run(os.Args)
 }
