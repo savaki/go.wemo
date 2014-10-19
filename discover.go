@@ -48,7 +48,7 @@ func (self *Wemo) Discover(urn string, timeout time.Duration) ([]*Device, error)
 	for _, uri := range locations {
 		if matches := belkinRE.FindStringSubmatch(uri.String()); len(matches) == 2 {
 			host := matches[1]
-			devices = append(devices, &Device{host})
+			devices = append(devices, &Device{Host: host})
 		}
 	}
 

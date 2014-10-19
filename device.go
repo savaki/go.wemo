@@ -14,17 +14,21 @@
 package wemo
 
 import (
+	"code.google.com/p/go.net/context"
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/savaki/httpctx"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"regexp"
 	"strconv"
 )
 
 type Device struct {
-	Host string
+	Host   string
+	Logger func(string, ...interface{}) (int, error)
 }
 
 type DeviceInfo struct {
@@ -39,15 +43,18 @@ type BelkinResponse struct {
 	Device DeviceInfo `xml:"device"`
 }
 
-func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
-	uri := fmt.Sprintf("http://%s/setup.xml", self.Host)
-	response, err := client.Get(uri)
-	if err != nil {
-		return nil, err
+func (d *Device) printf(format string, args ...interface{}) {
+	if d.Logger != nil {
+		d.Logger(format, args...)
 	}
+}
 
-	defer response.Body.Close()
-	data, err := ioutil.ReadAll(response.Body)
+func (d *Device) FetchDeviceInfo() (*DeviceInfo, error) {
+	var data []byte
+
+	ctx := context.Background()
+	uri := fmt.Sprintf("http://%s/setup.xml", d.Host)
+	err := httpctx.NewClient().Get(ctx, uri, nil, &data)
 	if err != nil {
 		return nil, err
 	}
@@ -58,35 +65,35 @@ func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
 		return nil, err
 	}
 
-	fmt.Printf("%+v\n", resp.Device)
+	d.printf("%+v\n", resp.Device)
 
 	return &resp.Device, nil
 }
 
-func (self *Device) GetBinaryState() int {
+func (d *Device) GetBinaryState() int {
 	message := newGetBinaryStateMessage()
-	response, err := post(self.Host, "GetBinaryState", message)
+	response, err := post(d.Host, "GetBinaryState", message)
 	if err != nil {
-		log.Printf("unable to fetch BinaryState => %s\n", err)
+		d.printf("unable to fetch BinaryState => %s\n", err)
 		return -1
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		log.Printf("GetBinaryState returned status code => %d\n", response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		d.printf("GetBinaryState returned status code => %d\n", response.StatusCode)
 		return -1
 	}
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Printf("unable to read data => %s\n", err)
+		d.printf("unable to read data => %s\n", err)
 		return -1
 	}
 
 	re := regexp.MustCompile(`.*<BinaryState>(\d+)</BinaryState>.*`)
 	matches := re.FindStringSubmatch(string(data))
 	if len(matches) != 2 {
-		log.Printf("unable to find BinaryState response in message => %s\n", string(data))
+		d.printf("unable to find BinaryState response in message => %s\n", string(data))
 		return -1
 	}
 
@@ -94,26 +101,26 @@ func (self *Device) GetBinaryState() int {
 	return result
 }
 
-func (self *Device) Off() {
-	self.changeState(false)
+func (d *Device) Off() {
+	d.changeState(false)
 }
 
-func (self *Device) On() {
-	self.changeState(true)
+func (d *Device) On() {
+	d.changeState(true)
 }
 
-func (self *Device) Toggle() {
-	if binaryState := self.GetBinaryState(); binaryState == 0 {
-		self.On()
+func (d *Device) Toggle() {
+	if binaryState := d.GetBinaryState(); binaryState == 0 {
+		d.On()
 	} else {
-		self.Off()
+		d.Off()
 	}
 }
 
-func (self *Device) changeState(newState bool) error {
+func (d *Device) changeState(newState bool) error {
 	fmt.Printf("changeState(%v)\n", newState)
 	message := newSetBinaryStateMessage(newState)
-	response, err := post(self.Host, "SetBinaryState", message)
+	response, err := post(d.Host, "SetBinaryState", message)
 	if err != nil {
 		log.Println("unable to SetBinaryState")
 		return err

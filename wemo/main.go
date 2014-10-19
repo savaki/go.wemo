@@ -13,8 +13,18 @@
 // limitations under the License.
 package main
 
-import "fmt"
+import (
+	"github.com/codegangsta/cli"
+	"os"
+)
 
 func main() {
-	fmt.Println("hello world")
+	app := cli.NewApp()
+	app.Name = "wemo"
+	app.Usage = "command line interface wemo"
+	app.Version = "0.1"
+	app.Commands = []cli.Command{
+		discoverCommand,
+	}
+	app.Run(os.Args)
 }
