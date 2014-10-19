@@ -14,17 +14,20 @@
 package wemo
 
 import (
+	"code.google.com/p/go.net/context"
 	"time"
 )
 
 func (self *Wemo) foreach(friendlyName string, timeout time.Duration, callback func(*Device)) error {
+	ctx := context.Background()
+
 	devices, err := self.DiscoverAll(timeout)
 	if err != nil {
 		return err
 	}
 
 	for _, device := range devices {
-		deviceInfo, err := device.FetchDeviceInfo()
+		deviceInfo, err := device.FetchDeviceInfo(ctx)
 		if err != nil {
 			return err
 		}

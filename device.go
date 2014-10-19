@@ -49,10 +49,9 @@ func (d *Device) printf(format string, args ...interface{}) {
 	}
 }
 
-func (d *Device) FetchDeviceInfo() (*DeviceInfo, error) {
+func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 	var data []byte
 
-	ctx := context.Background()
 	uri := fmt.Sprintf("http://%s/setup.xml", d.Host)
 	err := httpctx.NewClient().Get(ctx, uri, nil, &data)
 	if err != nil {

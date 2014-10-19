@@ -26,8 +26,13 @@ type Wemo struct {
 }
 
 func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
+	urns := []string{
+		"urn:Belkin:device:controllee:1",
+		"urn:Belkin:device:light:1",
+		"urn:Belkin:device:sensor:1",
+	}
+
 	var all []*Device
-	urns := []string{"urn:Belkin:device:controllee:1", "urn:Belkin:device:light:1", "urn:Belkin:device:sensor:1"}
 	for _, urn := range urns {
 		devices, _ := self.Discover(urn, timeout)
 		for _, device := range devices {
