@@ -15,6 +15,7 @@ package wemo
 
 import (
 	"fmt"
+	. "github.com/smartystreets/goconvey/convey"
 	"os"
 	"testing"
 	"time"
@@ -45,28 +46,34 @@ func TestDisoverAll(t *testing.T) {
 }
 
 func TestRENoMatch(t *testing.T) {
-	var url = "http://10.0.11:80/description.xml"
+	Convey("Given a url that does not contain setup.xml", t, func() {
+		var url = "http://10.0.11:80/description.xml"
 
-	// When
-	matches := belkinRE.FindStringSubmatch(url)
+		Convey("When I call belkinRE.FindStringSubmatch", func() {
+			matches := belkinRE.FindStringSubmatch(url)
 
-	// Then
-	if len(matches) != 0 {
-		t.Fail()
-	}
+			Convey("Then I expect no errors", func() {
+				So(len(matches), ShouldEqual, 0)
+			})
+		})
+	})
 }
 
 func TestREMatch(t *testing.T) {
-	var url = "http://10.0.1.17:49153/setup.xml"
+	Convey("Given a URL", t, func() {
+		var url = "http://10.0.1.17:49153/setup.xml"
 
-	// When
-	matches := belkinRE.FindStringSubmatch(url)
+		Convey("When I call belkinRE.FindStringSubmatch", func() {
+			// When
+			matches := belkinRE.FindStringSubmatch(url)
 
-	// Then
-	if len(matches) != 2 {
-		t.Fail()
-	}
-	if matches[1] != "10.0.1.17:49153" {
-		t.Fail()
-	}
+			Convey("Then I expect 2 matches", func() {
+				So(len(matches), ShouldEqual, 2)
+			})
+
+			Convey("And I expect a host match", func() {
+				So(matches[1], ShouldEqual, "10.0.1.17:49153")
+			})
+		})
+	})
 }
