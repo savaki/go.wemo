@@ -30,6 +30,7 @@ func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 		"urn:Belkin:device:controllee:1",
 		"urn:Belkin:device:light:1",
 		"urn:Belkin:device:sensor:1",
+		"urn:Belkin:device:netcam:1",
 	}
 
 	var all []*Device
@@ -56,6 +57,5 @@ func (self *Wemo) Discover(urn string, timeout time.Duration) ([]*Device, error)
 			devices = append(devices, &Device{Host: host})
 		}
 	}
-
 	return devices, nil
 }
