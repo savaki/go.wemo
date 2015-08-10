@@ -2,6 +2,7 @@ go.wemo
 =======
 
 [![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
+[![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
 
 Simple package to interface with Belkin wemo devices.
 
