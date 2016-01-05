@@ -1,7 +1,7 @@
 go.wemo
 =======
 
-[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
+[![GoDoc](http://godoc.org/github.com/andrewpurkett/go.wemo?status.png)](http://godoc.org/github.com/andrewpurkett/go.wemo)
 [![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
 
 Simple package to interface with Belkin wemo devices.
@@ -49,7 +49,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/savaki/go.wemo"
+	"github.com/andrewpurkett/go.wemo"
 	"time"
 )
 
@@ -69,7 +69,7 @@ package main
 
 import (
   "fmt"
-  "github.com/savaki/go.wemo"
+  "github.com/andrewpurkett/go.wemo"
 )
 
 func main() {
@@ -97,7 +97,7 @@ As a convenience method, you can control lights through a more generic interface
 package main
 
 import (
-  "github.com/savaki/go.wemo"
+  "github.com/andrewpurkett/go.wemo"
   "time"
 )
 

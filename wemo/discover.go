@@ -4,7 +4,7 @@ import (
 	"code.google.com/p/go.net/context"
 	"fmt"
 	"github.com/codegangsta/cli"
-	"github.com/savaki/go.wemo"
+	"github.com/andrewpurkett/go.wemo"
 	"log"
 	"sort"
 	"time"
