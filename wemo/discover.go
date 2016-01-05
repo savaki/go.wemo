@@ -17,14 +17,12 @@ var discoverCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name: "interface",
-			Aliases: []string{"i"},
 			Value: "",
 			Usage: "search by interface",
 			EnvVar: "WEMO_IFACE",
 		},
 		cli.IntFlag{
 			Name: "timeout",
-			Aliases: []string{"t"},
 			Value: 3,
 			Usage: "timeout period in seconds",
 			EnvVar: "WEMO_TIMEOUT_DISCOVERY",

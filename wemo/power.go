@@ -10,7 +10,6 @@ var onCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name: "host",
-			Aliases: []string{"h"},
 			Value: "",
 			Usage: "device host and ip e.g. 10.0.1.2:49128",
 			EnvVar: "WEMO_POWER_HOST",
@@ -32,7 +31,6 @@ var offCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name: "host",
-			Aliases: []string{"h"},
 			Value: "",
 			Usage: "device host and ip e.g. 10.0.1.2:49128",
 			EnvVar: "WEMO_POWER_HOST",
@@ -54,7 +52,6 @@ var toggleCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{
 			Name: "host",
-			Aliases: []string{"h"},
 			Value: "",
 			Usage: "device host and ip e.g. 10.0.1.2:49128",
 			EnvVar: "WEMO_POWER_HOST",
