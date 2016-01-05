@@ -10,17 +10,23 @@ import (
 	"time"
 )
 
-// cli.Flag requires an additional pointer argument
-var giface, gip, gtimeout;
-
 var discoverCommand = cli.Command{
 	Name:        "discover",
 	Usage:       "find devices in the local network",
 	Description: "search for devices in the local network",
 	Flags: []cli.Flag{
-		cli.StringFlag{"interface", "", "search by interface", "", &piface},
-		cli.StringFlag{"ip", "", "discovery wemo by ip", "", &pip},
-		cli.IntFlag{"timeout", 3, "timeout", "", &ptimeout},
+		cli.StringFlag{
+			Name: "interface",
+			Value: "",
+			Usage: "search by interface",
+			EnvVar: "WEMO_IFACE",
+		},
+		cli.IntFlag{
+			Name: "timeout",
+			Value: 3,
+			Usage: "timeout period in seconds",
+			EnvVar: "WEMO_TIMEOUT_DISCOVERY",
+		},
 	},
 	Action: commandAction,
 }
@@ -68,7 +74,7 @@ func commandAction(c *cli.Context) {
 	for _, deviceInfo := range deviceInfos {
 		fmt.Printf(format,
 			deviceInfo.Device.Host,
-			deviceinfo.MacAddress,
+			deviceInfo.MacAddress,
 			deviceInfo.FriendlyName,
 			deviceInfo.FirmwareVersion,
 			deviceInfo.SerialNumber)
