@@ -45,20 +45,20 @@ func commandAction(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	format := "%-20s %-20s %-20s %-21s %-20s\n"
+	format := "%-22s %-13s %-15s %-31s %-35s\n"
 	fmt.Printf(format,
 		"Host",
 		"Mac Address",
+		"Serial Number",
 		"Friendly Name",
 		"Firmware Version",
-		"Serial Number",
 	)
 	fmt.Printf(format,
-		"----------------",
-		"----------------",
-		"----------------",
-		"----------------",
-		"----------------",
+		"---------------------",
+		"------------",
+		"--------------",
+		"------------------------------",
+		"-----------------------------------",
 	)
 
 	deviceInfos := wemo.DeviceInfos{}
@@ -75,8 +75,8 @@ func commandAction(c *cli.Context) {
 		fmt.Printf(format,
 			deviceInfo.Device.Host,
 			deviceInfo.MacAddress,
+			deviceInfo.SerialNumber,
 			deviceInfo.FriendlyName,
-			deviceInfo.FirmwareVersion,
-			deviceInfo.SerialNumber)
+			deviceInfo.FirmwareVersion)
 	}
 }
