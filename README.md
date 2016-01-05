@@ -2,7 +2,7 @@ go.wemo
 =======
 
 [![GoDoc](http://godoc.org/github.com/andrewpurkett/go.wemo?status.png)](http://godoc.org/github.com/andrewpurkett/go.wemo)
-[![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
+[![Build Status](https://snap-ci.com/andrewpurkett/go.wemo/branch/master/build_image)](https://snap-ci.com/andrewpurkett/go.wemo/branch/master)
 
 Simple package to interface with Belkin wemo devices.
 
@@ -12,17 +12,17 @@ Install the go library and configure it as needed, ensuring `~/bin/src/` is in y
 
 Run the following command from `~/bin/src/`:
 
-`go get https://github.com/savaki/go.wemo`
+`go get https://github.com/andrewpurkett/go.wemo`
 
 navigate into the new directory:
 
-`cd ~/bin/src/github.com/savaki/go.wemo`
+`cd ~/bin/src/github.com/andrewpurkett/go.wemo`
 
 Run `go get` to retrieve dependencies
 
 navigate into the example usage directory:
 
-`cd ~/bin/src/github.com/savaki/go.wemo/wemo`
+`cd ~/bin/src/github.com/andrewpurkett/go.wemo/wemo`
 
 Run `go get` again to retrieve dependencies for the example usage directory
 
@@ -32,11 +32,11 @@ Build the example usage tool:
 
 Then refer to the command line tool to see sample usage:
  
-`~/bin/src/github.com/savaki/go.wemo/wemo/wemo`
+`~/bin/src/github.com/andrewpurkett/go.wemo/wemo/wemo`
 
-`~/bin/src/github.com/savaki/go.wemo/wemo/wemo discover -h`
+`~/bin/src/github.com/andrewpurkett/go.wemo/wemo/wemo discover -h`
 
-If you were unable to build the CLI tool, run `go test` (in both `~/bin/src/github.com/savaki/go.wemo/wemo` and `~/bin/src/github.com/savaki/go.wemo/`), check your `GOPATH`, `GOROOT`, and repeat any other golang setup steps required.
+If you were unable to build the CLI tool, run `go test` (in both `~/bin/src/github.com/andrewpurkett/go.wemo/wemo` and `~/bin/src/github.com/andrewpurkett/go.wemo/`), check your `GOPATH`, `GOROOT`, and repeat any other golang setup steps required.
 
 ## Utilizing the library in projects
 
