@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"math/big"
 )
 
 type Device struct {
@@ -80,6 +81,13 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 
 	deviceInfo.Device = d
 	return deviceInfo, nil
+}
+
+func IncrementMacAddress(inputMac string) (string) {
+	p1:=big.NewInt(0)
+	p1.SetString(inputMac, 16)
+	p1 = big.NewInt(0).Add(p1, big.NewInt(1))
+	return fmt.Sprintf("%0x", p1)
 }
 
 func (d *Device) GetBinaryState() int {
