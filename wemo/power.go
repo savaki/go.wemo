@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/savaki/go.wemo"
+	"github.com/andrewpurkett/go.wemo"
 )
 
 var phost;
