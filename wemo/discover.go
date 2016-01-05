@@ -36,14 +36,16 @@ func commandAction(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	format := "%-20s %-20s %-21s %-20s\n"
+	format := "%-20s %-20s %-20s %-21s %-20s\n"
 	fmt.Printf(format,
 		"Host",
+		"Mac Address",
 		"Friendly Name",
 		"Firmware Version",
 		"Serial Number",
 	)
 	fmt.Printf(format,
+		"----------------",
 		"----------------",
 		"----------------",
 		"----------------",
@@ -63,6 +65,7 @@ func commandAction(c *cli.Context) {
 	for _, deviceInfo := range deviceInfos {
 		fmt.Printf(format,
 			deviceInfo.Device.Host,
+			deviceinfo.MacAddress,
 			deviceInfo.FriendlyName,
 			deviceInfo.FirmwareVersion,
 			deviceInfo.SerialNumber)
