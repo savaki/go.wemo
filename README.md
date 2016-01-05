@@ -5,8 +5,6 @@ go.wemo
 
 Simple package to interface with Belkin wemo devices.
 
-Please utilize the branch [forktest](https://github.com/andrewpurkett/go.wemo/tree/forktest) until a pull request has been submitted for the changes to this library, due to the nature of how go imports libraries.
-
 ## Standalone Usage Guide
 
 Install the go library and configure it as needed, ensuring `~/bin/go/src/` is in your `GOPATH` environment variable. 
