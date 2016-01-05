@@ -35,6 +35,8 @@ Then refer to the command line tool to see sample usage:
 
 `~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo/wemo discover -h`
 
+![Example usage](https://i.imgur.com/UYI2E4F.png)
+
 If you were unable to build the CLI tool, run `go test` (in both `~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo` and `~/bin/go/src/github.com/andrewpurkett/go.wemo/`), check your `GOPATH`, `GOROOT`, and repeat any other golang setup steps required.
 
 ## Utilizing the library in projects
