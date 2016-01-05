@@ -6,6 +6,42 @@ go.wemo
 
 Simple package to interface with Belkin wemo devices.
 
+## Standalone Usage Guide
+
+Install the go library and configure it as needed, ensuring `~/bin/src/` is in your `GOPATH` environment variable. 
+
+Run the following command from `~/bin/src/`:
+
+`go get https://github.com/savaki/go.wemo`
+
+navigate into the new directory:
+
+`cd ~/bin/src/github.com/savaki/go.wemo`
+
+Run `go get` to retrieve dependencies
+
+navigate into the example usage directory:
+
+`cd ~/bin/src/github.com/savaki/go.wemo/wemo`
+
+Run `go get` again to retrieve dependencies for the example usage directory
+
+Build the example usage tool:
+
+`go build`
+
+Then refer to the command line tool to see sample usage:
+ 
+`~/bin/src/github.com/savaki/go.wemo/wemo/wemo`
+
+`~/bin/src/github.com/savaki/go.wemo/wemo/wemo discover -h`
+
+If you were unable to build the CLI tool, run `go test` (in both `~/bin/src/github.com/savaki/go.wemo/wemo` and `~/bin/src/github.com/savaki/go.wemo/`), check your `GOPATH`, `GOROOT`, and repeat any other golang setup steps required.
+
+## Utilizing the library in projects
+
+Here is some example usage of the various functionality incorporated in this go repository:
+
 ### Example - Device discovery
 
 ```
