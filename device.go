@@ -61,6 +61,7 @@ func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
 	if err != nil {
 		return nil, err
 	}
+	resp.DeviceInfo.MacAddress = IncrementMacAddress(resp.DeviceInfo.MacAddress)
 
 	return &resp.DeviceInfo, nil
 }
@@ -87,7 +88,7 @@ func IncrementMacAddress(inputMac string) (string) {
 	p1:=big.NewInt(0)
 	p1.SetString(inputMac, 16)
 	p1 = big.NewInt(0).Add(p1, big.NewInt(1))
-	return fmt.Sprintf("%0x", p1)
+	return fmt.Sprintf("%0X", p1)
 }
 
 func (d *Device) GetBinaryState() int {
