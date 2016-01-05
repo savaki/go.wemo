@@ -10,14 +10,17 @@ import (
 	"time"
 )
 
+// cli.Flag requires an additional pointer argument
+var giface, gip, gtimeout;
+
 var discoverCommand = cli.Command{
 	Name:        "discover",
 	Usage:       "find devices in the local network",
 	Description: "search for devices in the local network",
 	Flags: []cli.Flag{
-		cli.StringFlag{"interface", "", "search by interface", ""},
-		cli.StringFlag{"ip", "", "discovery wemo by ip", ""},
-		cli.IntFlag{"timeout", 3, "timeout", ""},
+		cli.StringFlag{"interface", "", "search by interface", "", &piface},
+		cli.StringFlag{"ip", "", "discovery wemo by ip", "", &pip},
+		cli.IntFlag{"timeout", 3, "timeout", "", &ptimeout},
 	},
 	Action: commandAction,
 }
