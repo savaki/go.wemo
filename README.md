@@ -17,6 +17,8 @@ navigate into the new directory:
 
 `cd ~/bin/go/src/github.com/andrewpurkett/go.wemo`
 
+To use this fork, run `git checkout forktest`, now, to avoid any conflicts.
+
 Run `go get` to retrieve dependencies
 
 navigate into the example usage directory:
