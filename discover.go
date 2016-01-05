@@ -27,9 +27,16 @@ type Wemo struct {
 
 func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 	urns := []string{
-		"urn:Belkin:device:controllee:1",
-		"urn:Belkin:device:light:1",
-		"urn:Belkin:device:sensor:1",
+        // TODO: Include additional third-party WeMo devices from Holmes and Mr. Coffee
+                "urn:Belkin:device:bridge:1",     // WeMo Link
+                "urn:Belkin:device:controllee:1", // WeMo Switch
+                "urn:Belkin:device:crockpot:1",   // WeMo Crockpot
+                "urn:Belkin:device:insight:1",    // WeMo Insight Switch
+                "urn:Belkin:device:lightswitch:1",// WeMo Light Switch
+                "urn:Belkin:device:Maker:1",      // WeMo Maker
+                "urn:Belkin:device:netcam:1",     // WeMo NetCam and NetCam HD+
+                "urn:Belkin:device:sensor:1",     // WeMo Motion Sensor
+                "urn:Belkin:device:wemo_baby:1",  // WeMo Baby Monitor
 	}
 
 	var all []*Device
