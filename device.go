@@ -14,16 +14,17 @@
 package wemo
 
 import (
-	"code.google.com/p/go.net/context"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/savaki/httpctx"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"github.com/savaki/httpctx"
+	"golang.org/x/net/context"
 )
 
 type Device struct {
