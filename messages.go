@@ -64,3 +64,12 @@ func newSetBinaryStateMessage(on bool) string {
   </s:Body>
 </s:Envelope>`, value)
 }
+
+func newGetInsightParamsMessage() string {
+	return `<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <s:Body>
+    <u:GetInsightParams xmlns:u="urn:Belkin:service:insight:1"></u:GetInsightParams>
+  </s:Body>
+</s:Envelope>`
+}

@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Device struct {
@@ -153,4 +154,53 @@ func (d *Device) changeState(newState bool) error {
 	}
 
 	return nil
+}
+
+type InsightParams struct {
+	Power int // mW
+}
+
+func (d *Device) GetInsightParams() *InsightParams {
+	message := newGetInsightParamsMessage()
+	response, err := post(d.Host, "insight", "GetInsightParams", message)
+	if err != nil {
+		d.printf("unable to fetch Power => %s\n", err)
+		return nil
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		d.printf("GetInsightParams returned status code => %d\n", response.StatusCode)
+		return nil
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		d.printf("unable to read data => %s\n", err)
+		return nil
+	}
+
+	// <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body>
+	// <u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">
+	// <InsightParams>8|1471416661|8|3244|3182|15377|19|7300|1011115|1011115.000000|8000</InsightParams>
+	// </u:GetInsightParamsResponse>
+
+	re := regexp.MustCompile(`.*<InsightParams>(.+)</InsightParams>.*`)
+	matches := re.FindStringSubmatch(string(data))
+	if len(matches) != 2 {
+		d.printf("unable to find GetInsightParams response in message => %s\n", string(data))
+		return nil
+	}
+	split := strings.Split(matches[1], "|")
+	if len(split) < 7 {
+		d.printf("unable to parse InsightParams response => %s\n", string(data))
+		return nil
+	}
+	power, err := strconv.Atoi(split[7])
+	if err != nil {
+		d.printf("failed to parse power: %v", err)
+	}
+	return &InsightParams{
+		Power: power,
+	}
 }
