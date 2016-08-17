@@ -84,7 +84,7 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 
 func (d *Device) GetBinaryState() int {
 	message := newGetBinaryStateMessage()
-	response, err := post(d.Host, "GetBinaryState", message)
+	response, err := post(d.Host, "basicevent", "GetBinaryState", message)
 	if err != nil {
 		d.printf("unable to fetch BinaryState => %s\n", err)
 		return -1
@@ -132,7 +132,7 @@ func (d *Device) Toggle() {
 func (d *Device) changeState(newState bool) error {
 	fmt.Printf("changeState(%v)\n", newState)
 	message := newSetBinaryStateMessage(newState)
-	response, err := post(d.Host, "SetBinaryState", message)
+	response, err := post(d.Host, "basicevent", "SetBinaryState", message)
 	if err != nil {
 		log.Println("unable to SetBinaryState")
 		return err
