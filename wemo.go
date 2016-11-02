@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +15,15 @@
 package wemo
 
 import (
-	"golang.org/x/net/context"
 	"time"
+
+	"golang.org/x/net/context"
 )
 
-func (self *Wemo) foreach(friendlyName string, timeout time.Duration, callback func(*Device)) error {
+func (w *Wemo) foreach(friendlyName string, timeout time.Duration, callback func(*Device)) error {
 	ctx := context.Background()
 
-	devices, err := self.DiscoverAll(timeout)
+	devices, err := w.DiscoverAll(timeout)
 	if err != nil {
 		return err
 	}
@@ -40,20 +42,23 @@ func (self *Wemo) foreach(friendlyName string, timeout time.Duration, callback f
 	return nil
 }
 
-func (self *Wemo) On(friendlyName string, timeout time.Duration) {
-	self.foreach(friendlyName, timeout, func(device *Device) {
+// On ...
+func (w *Wemo) On(friendlyName string, timeout time.Duration) {
+	w.foreach(friendlyName, timeout, func(device *Device) {
 		device.On()
 	})
 }
 
-func (self *Wemo) Off(friendlyName string, timeout time.Duration) {
-	self.foreach(friendlyName, timeout, func(device *Device) {
+// Off ...
+func (w *Wemo) Off(friendlyName string, timeout time.Duration) {
+	w.foreach(friendlyName, timeout, func(device *Device) {
 		device.Off()
 	})
 }
 
-func (self *Wemo) Toggle(friendlyName string, timeout time.Duration) {
-	self.foreach(friendlyName, timeout, func(device *Device) {
+// Toggle ...
+func (w *Wemo) Toggle(friendlyName string, timeout time.Duration) {
+	w.foreach(friendlyName, timeout, func(device *Device) {
 		device.Toggle()
 	})
 }

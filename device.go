@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,21 +18,26 @@ import (
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/savaki/httpctx"
-	"golang.org/x/net/context"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"golang.org/x/net/context"
+
+	"github.com/savaki/httpctx"
+	//"golang.org/x/net/context"
 )
 
+// Device ...
 type Device struct {
 	Host   string
 	Logger func(string, ...interface{}) (int, error)
 }
 
+// DeviceInfo ...
 type DeviceInfo struct {
 	Device          *Device `json:"-"`
 	DeviceType      string  `xml:"deviceType" json:"device-type"`
@@ -41,6 +47,7 @@ type DeviceInfo struct {
 	SerialNumber    string  `xml:"serialNumber" json:"serial-number"`
 }
 
+// DeviceInfos ...
 type DeviceInfos []*DeviceInfo
 
 func (d DeviceInfos) Len() int           { return len(d) }
@@ -65,6 +72,7 @@ func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
 	return &resp.DeviceInfo, nil
 }
 
+// FetchDeviceInfo ...
 func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 	var data []byte
 
@@ -79,16 +87,11 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 		return nil, err
 	}
 
-<<<<<<< HEAD
-	//log.Printf("%+v\n", resp.Device)
-
-	return &resp.Device, nil
-=======
 	deviceInfo.Device = d
 	return deviceInfo, nil
->>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
 }
 
+// GetBinaryState ...
 func (d *Device) GetBinaryState() int {
 	message := newGetBinaryStateMessage()
 	response, err := post(d.Host, "basicevent", "GetBinaryState", message)
@@ -120,14 +123,17 @@ func (d *Device) GetBinaryState() int {
 	return result
 }
 
+// Off ...
 func (d *Device) Off() {
 	d.changeState(false)
 }
 
+// On ...
 func (d *Device) On() {
 	d.changeState(true)
 }
 
+// Toggle ...
 func (d *Device) Toggle() {
 	if binaryState := d.GetBinaryState(); binaryState == 0 {
 		d.On()
@@ -136,13 +142,9 @@ func (d *Device) Toggle() {
 	}
 }
 
-<<<<<<< HEAD
-func (self *Device) changeState(newState bool) error {
-	//fmt.Printf("changeState(%v)\n", newState)
-=======
 func (d *Device) changeState(newState bool) error {
 	fmt.Printf("changeState(%v)\n", newState)
->>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
+
 	message := newSetBinaryStateMessage(newState)
 	response, err := post(d.Host, "basicevent", "SetBinaryState", message)
 	if err != nil {
@@ -167,10 +169,12 @@ func (d *Device) changeState(newState bool) error {
 	return nil
 }
 
+// InsightParams ...
 type InsightParams struct {
 	Power int // mW
 }
 
+// GetInsightParams ...
 func (d *Device) GetInsightParams() *InsightParams {
 	message := newGetInsightParamsMessage()
 	response, err := post(d.Host, "insight", "GetInsightParams", message)

@@ -21,6 +21,8 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+
+	"golang.org/x/net/context"
 )
 
 //SubscriptionInfo struct
@@ -93,7 +95,7 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 	*/
 
 	// Initial Subscribe
-	info, _ := d.FetchDeviceInfo()
+	info, _ := d.FetchDeviceInfo(context.Background())
 
 	id, err := d.Subscribe(listenerAddress, timeout)
 	if err != 200 {
@@ -109,7 +111,7 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 			timer.Reset(time.Second * time.Duration(timeout))
 
 			// Resubscribe
-			_, err := d.ReSubscribe(id, timeout)
+			_, err = d.ReSubscribe(id, timeout)
 			if err != 200 {
 
 				// Failed to resubscribe so try unsubscribe, it is likely to fail but don't care.

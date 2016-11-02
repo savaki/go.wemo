@@ -15,8 +15,9 @@ package wemo
 
 import (
 	"encoding/json"
-	. "github.com/smartystreets/goconvey/convey"
 	"testing"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func assert(t *testing.T, actual, expected string) {

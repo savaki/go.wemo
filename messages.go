@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,12 +21,14 @@ import (
 
 var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
 
+// Wemo ...
 type Wemo struct {
 	ipAddr string
 	Debug  bool
 }
 
-func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
+// DiscoverAll ...
+func (w *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 	urns := []string{
 		"urn:Belkin:device:controllee:1",
 		"urn:Belkin:device:light:1",
@@ -36,7 +39,7 @@ func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 
 	var all []*Device
 	for _, urn := range urns {
-		devices, _ := self.Discover(urn, timeout)
+		devices, _ := w.Discover(urn, timeout)
 		for _, device := range devices {
 			all = append(all, device)
 		}
@@ -45,8 +48,9 @@ func (self *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 	return all, nil
 }
 
-func (self *Wemo) Discover(urn string, timeout time.Duration) ([]*Device, error) {
-	locations, err := self.scan(urn, timeout)
+// Discover ...
+func (w *Wemo) Discover(urn string, timeout time.Duration) ([]*Device, error) {
+	locations, err := w.scan(urn, timeout)
 	if err != nil {
 		return nil, err
 	}

@@ -1,20 +1,15 @@
 go.wemo
 =======
 
-<<<<<<< HEAD
-I submitted a pull request for the changes I have made to this library. The request is pending, so I have edited the infor below to reflect the location of this library.
-
 [![GoDoc](http://godoc.org/github.com/danward79/go.wemo?status.png)](http://godoc.org/github.com/danward79/go.wemo)
-=======
-[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
 [![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
->>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
+
 
 Simple package to interface with Belkin wemo devices.
 
 ### Example - Device discovery
 
-```
+```go
 package main
 
 import (
@@ -34,7 +29,7 @@ func main() {
 
 ### Example - Control a device
 
-```
+```go
 package main
 
 import (
@@ -63,7 +58,7 @@ func main() {
 
 As a convenience method, you can control lights through a more generic interface.
 
-```
+```go
 package main
 
 import (
@@ -83,7 +78,7 @@ func main() {
 
 This is an example of discovering devices, subscribing to there events and being notified of changed to there state. Resubscriptions are managed automatically at the timeout specified. Subscriber details and state are maintained in a map.
 
-```
+```go
 package main
 
 import (
@@ -93,14 +88,14 @@ import (
 )
 
 func main() {
-  
+
   listenerAddress := "192.168.0.6:6767"
   timeout := 300
-  
+
   api, _ := wemo.NewByInterface("en0")
-  
+
   devices, _ := api.DiscoverAll(3*time.Second)
- 
+
   subscriptions := make(map[string]*wemo.SubscriptionInfo)
 
   for _, device := range devices {
@@ -109,7 +104,7 @@ func main() {
       log.Println("Initial Error Subscribing: ", err)   
     }
   }
-  
+
   cs := make(chan wemo.SubscriptionEvent)
 
   go wemo.Listener(listenerAddress, cs)
@@ -125,6 +120,3 @@ func main() {
 
 }
 ```
-
-
-
