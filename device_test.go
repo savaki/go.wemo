@@ -1,8 +1,21 @@
+// Copyright 2014 Matt Ho
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package wemo
 
 import (
 	"encoding/json"
-	"encoding/xml"
+	. "github.com/smartystreets/goconvey/convey"
 	"testing"
 )
 
@@ -14,7 +27,8 @@ func assert(t *testing.T, actual, expected string) {
 }
 
 func TestParseResponseXML(t *testing.T) {
-	data := []byte(`<?xml version="1.0"?>
+	Convey("Given an XML response", t, func() {
+		data := []byte(`<?xml version="1.0"?>
 <root xmlns="urn:Belkin:device-1-0">
   <specVersion>
     <major>1</major>
@@ -112,21 +126,35 @@ func TestParseResponseXML(t *testing.T) {
 </root>
 	`)
 
-	// When
-	response := new(BelkinResponse)
-	xml.Unmarshal(data, response)
+		Convey("When I call #unmarshallDeviceInfo", func() {
+			deviceInfo, _ := unmarshalDeviceInfo(data)
 
-	// Then
-	deviceInfo := response.Device
-	assert(t, deviceInfo.DeviceType, "urn:Belkin:device:controllee:1")
-	assert(t, deviceInfo.FirmwareVersion, "WeMo_US_2.00.2769.PVT")
-	assert(t, deviceInfo.FriendlyName, "Pirate Light Right")
-	assert(t, deviceInfo.MacAddress, "EC1A5974B1EC")
-	assert(t, deviceInfo.SerialNumber, "221248K0102C92")
+			Convey("Then I expect DeviceType to be set", func() {
+				So(deviceInfo.DeviceType, ShouldEqual, "urn:Belkin:device:controllee:1")
+			})
+
+			Convey("Then I expect FirmwareVersion to be set", func() {
+				So(deviceInfo.FirmwareVersion, ShouldEqual, "WeMo_US_2.00.2769.PVT")
+			})
+
+			Convey("Then I expect FriendlyName to be set", func() {
+				So(deviceInfo.FriendlyName, ShouldEqual, "Pirate Light Right")
+			})
+
+			Convey("Then I expect MacAddress to be set", func() {
+				So(deviceInfo.MacAddress, ShouldEqual, "EC1A5974B1EC")
+			})
+
+			Convey("Then I expect SerialNumber to be set", func() {
+				So(deviceInfo.SerialNumber, ShouldEqual, "221248K0102C92")
+			})
+		})
+	})
 }
 
 func TestParseResponseJSON(t *testing.T) {
-	data := []byte(`{
+	Convey("Given a test response", t, func() {
+		data := []byte(`{
 			"device-type":"das device",
 			"friendly-name":"das name",
 			"mac-address":"das address",
@@ -134,13 +162,29 @@ func TestParseResponseJSON(t *testing.T) {
 			"serial-number":"das serial"
 		}`)
 
-	deviceInfo := new(DeviceInfo)
-	json.Unmarshal(data, deviceInfo)
+		Convey("When I unmarshall the response", func() {
+			deviceInfo := new(DeviceInfo)
+			json.Unmarshal(data, deviceInfo)
 
-	// Then
-	assert(t, deviceInfo.DeviceType, "das device")
-	assert(t, deviceInfo.FirmwareVersion, "das firmware")
-	assert(t, deviceInfo.FriendlyName, "das name")
-	assert(t, deviceInfo.MacAddress, "das address")
-	assert(t, deviceInfo.SerialNumber, "das serial")
+			Convey("Then I expect DeviceType to be set", func() {
+				So(deviceInfo.DeviceType, ShouldEqual, "das device")
+			})
+
+			Convey("Then I expect FirmwareVersion to be set", func() {
+				So(deviceInfo.FirmwareVersion, ShouldEqual, "das firmware")
+			})
+
+			Convey("Then I expect FriendlyName to be set", func() {
+				So(deviceInfo.FriendlyName, ShouldEqual, "das name")
+			})
+
+			Convey("Then I expect MacAddress to be set", func() {
+				So(deviceInfo.MacAddress, ShouldEqual, "das address")
+			})
+
+			Convey("Then I expect SerialNumber to be set", func() {
+				So(deviceInfo.SerialNumber, ShouldEqual, "das serial")
+			})
+		})
+	})
 }
