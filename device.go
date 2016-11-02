@@ -1,79 +1,118 @@
+// Copyright 2014 Matt Ho
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
 package wemo
 
 import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"github.com/savaki/httpctx"
+	"golang.org/x/net/context"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
 type Device struct {
-	Host string
+	Host   string
+	Logger func(string, ...interface{}) (int, error)
 }
 
 type DeviceInfo struct {
-	DeviceType      string `xml:"deviceType" json:"device-type"`
-	FriendlyName    string `xml:"friendlyName" json:"friendly-name"`
-	MacAddress      string `xml:"macAddress" json:"mac-address"`
-	FirmwareVersion string `xml:"firmwareVersion" json:"firmware-version"`
-	SerialNumber    string `xml:"serialNumber" json:"serial-number"`
+	Device          *Device `json:"-"`
+	DeviceType      string  `xml:"deviceType" json:"device-type"`
+	FriendlyName    string  `xml:"friendlyName" json:"friendly-name"`
+	MacAddress      string  `xml:"macAddress" json:"mac-address"`
+	FirmwareVersion string  `xml:"firmwareVersion" json:"firmware-version"`
+	SerialNumber    string  `xml:"serialNumber" json:"serial-number"`
 }
 
-type BelkinResponse struct {
-	Device DeviceInfo `xml:"device"`
+type DeviceInfos []*DeviceInfo
+
+func (d DeviceInfos) Len() int           { return len(d) }
+func (d DeviceInfos) Swap(i, j int)      { d[i], d[j] = d[j], d[i] }
+func (d DeviceInfos) Less(i, j int) bool { return d[i].FriendlyName < d[j].FriendlyName }
+
+func (d *Device) printf(format string, args ...interface{}) {
+	if d.Logger != nil {
+		d.Logger(format, args...)
+	}
 }
 
-func (self *Device) FetchDeviceInfo() (*DeviceInfo, error) {
-	uri := fmt.Sprintf("http://%s/setup.xml", self.Host)
-	response, err := client.Get(uri)
+func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
+	resp := struct {
+		DeviceInfo DeviceInfo `xml:"device"`
+	}{}
+	err := xml.Unmarshal(data, &resp)
 	if err != nil {
 		return nil, err
 	}
 
-	defer response.Body.Close()
-	data, err := ioutil.ReadAll(response.Body)
+	return &resp.DeviceInfo, nil
+}
+
+func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
+	var data []byte
+
+	uri := fmt.Sprintf("http://%s/setup.xml", d.Host)
+	err := httpctx.NewClient().Get(ctx, uri, nil, &data)
 	if err != nil {
 		return nil, err
 	}
 
-	resp := new(BelkinResponse)
-	err = xml.Unmarshal(data, resp)
+	deviceInfo, err := unmarshalDeviceInfo(data)
 	if err != nil {
 		return nil, err
 	}
 
+<<<<<<< HEAD
 	//log.Printf("%+v\n", resp.Device)
 
 	return &resp.Device, nil
+=======
+	deviceInfo.Device = d
+	return deviceInfo, nil
+>>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
 }
 
-func (self *Device) GetBinaryState() int {
+func (d *Device) GetBinaryState() int {
 	message := newGetBinaryStateMessage()
-	response, err := post(self.Host, "GetBinaryState", message)
+	response, err := post(d.Host, "basicevent", "GetBinaryState", message)
 	if err != nil {
-		log.Printf("unable to fetch BinaryState => %s\n", err)
+		d.printf("unable to fetch BinaryState => %s\n", err)
 		return -1
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		log.Printf("GetBinaryState returned status code => %d\n", response.StatusCode)
+	if response.StatusCode != http.StatusOK {
+		d.printf("GetBinaryState returned status code => %d\n", response.StatusCode)
 		return -1
 	}
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Printf("unable to read data => %s\n", err)
+		d.printf("unable to read data => %s\n", err)
 		return -1
 	}
 
 	re := regexp.MustCompile(`.*<BinaryState>(\d+)</BinaryState>.*`)
 	matches := re.FindStringSubmatch(string(data))
 	if len(matches) != 2 {
-		log.Printf("unable to find BinaryState response in message => %s\n", string(data))
+		d.printf("unable to find BinaryState response in message => %s\n", string(data))
 		return -1
 	}
 
@@ -81,26 +120,31 @@ func (self *Device) GetBinaryState() int {
 	return result
 }
 
-func (self *Device) Off() {
-	self.changeState(false)
+func (d *Device) Off() {
+	d.changeState(false)
 }
 
-func (self *Device) On() {
-	self.changeState(true)
+func (d *Device) On() {
+	d.changeState(true)
 }
 
-func (self *Device) Toggle() {
-	if binaryState := self.GetBinaryState(); binaryState == 0 {
-		self.On()
+func (d *Device) Toggle() {
+	if binaryState := d.GetBinaryState(); binaryState == 0 {
+		d.On()
 	} else {
-		self.Off()
+		d.Off()
 	}
 }
 
+<<<<<<< HEAD
 func (self *Device) changeState(newState bool) error {
 	//fmt.Printf("changeState(%v)\n", newState)
+=======
+func (d *Device) changeState(newState bool) error {
+	fmt.Printf("changeState(%v)\n", newState)
+>>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
 	message := newSetBinaryStateMessage(newState)
-	response, err := post(self.Host, "SetBinaryState", message)
+	response, err := post(d.Host, "basicevent", "SetBinaryState", message)
 	if err != nil {
 		log.Println("unable to SetBinaryState")
 		return err
@@ -121,4 +165,53 @@ func (self *Device) changeState(newState bool) error {
 	}
 
 	return nil
+}
+
+type InsightParams struct {
+	Power int // mW
+}
+
+func (d *Device) GetInsightParams() *InsightParams {
+	message := newGetInsightParamsMessage()
+	response, err := post(d.Host, "insight", "GetInsightParams", message)
+	if err != nil {
+		d.printf("unable to fetch Power => %s\n", err)
+		return nil
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		d.printf("GetInsightParams returned status code => %d\n", response.StatusCode)
+		return nil
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		d.printf("unable to read data => %s\n", err)
+		return nil
+	}
+
+	// <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"><s:Body>
+	// <u:GetInsightParamsResponse xmlns:u="urn:Belkin:service:metainfo:1">
+	// <InsightParams>8|1471416661|8|3244|3182|15377|19|7300|1011115|1011115.000000|8000</InsightParams>
+	// </u:GetInsightParamsResponse>
+
+	re := regexp.MustCompile(`.*<InsightParams>(.+)</InsightParams>.*`)
+	matches := re.FindStringSubmatch(string(data))
+	if len(matches) != 2 {
+		d.printf("unable to find GetInsightParams response in message => %s\n", string(data))
+		return nil
+	}
+	split := strings.Split(matches[1], "|")
+	if len(split) < 7 {
+		d.printf("unable to parse InsightParams response => %s\n", string(data))
+		return nil
+	}
+	power, err := strconv.Atoi(split[7])
+	if err != nil {
+		d.printf("failed to parse power: %v", err)
+	}
+	return &InsightParams{
+		Power: power,
+	}
 }

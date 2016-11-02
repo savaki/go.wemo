@@ -1,9 +1,14 @@
 go.wemo
 =======
 
+<<<<<<< HEAD
 I submitted a pull request for the changes I have made to this library. The request is pending, so I have edited the infor below to reflect the location of this library.
 
 [![GoDoc](http://godoc.org/github.com/danward79/go.wemo?status.png)](http://godoc.org/github.com/danward79/go.wemo)
+=======
+[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
+[![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
+>>>>>>> 6113bc2e76d18130690a3ab9e1520139559c58de
 
 Simple package to interface with Belkin wemo devices.
 
