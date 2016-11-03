@@ -19,7 +19,8 @@ import (
 	"time"
 )
 
-var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+//var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+var belkinRE = regexp.MustCompile(`http://([^/]+)/setup.xml`)
 
 // Wemo ...
 type Wemo struct {
@@ -35,6 +36,7 @@ func (w *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 		"urn:Belkin:device:sensor:1",
 		"urn:Belkin:device:netcam:1",
 		"urn:Belkin:device:insight:1",
+		"urn:Belkin:device:bridge:1",
 	}
 
 	var all []*Device

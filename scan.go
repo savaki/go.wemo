@@ -24,9 +24,12 @@ import (
 )
 
 const (
-	SSDP_BROADCAST = "239.255.255.250:1900"
-	M_SEARCH       = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
-	LOCATION       = "LOCATION: "
+	// SSDPBROADCAST ...
+	SSDPBROADCAST = "239.255.255.250:1900"
+	// MSEARCH ...
+	MSEARCH = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
+	// LOCATION ...
+	LOCATION = "LOCATION: "
 )
 
 // scan the multicast
@@ -44,7 +47,7 @@ func (w *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 	defer udpConn.Close()
 
 	//send the
-	mAddr, err := net.ResolveUDPAddr("udp", SSDP_BROADCAST)
+	mAddr, err := net.ResolveUDPAddr("udp", SSDPBROADCAST)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +55,7 @@ func (w *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 	if w.Debug {
 		log.Printf("Found multi-cast address %v", mAddr)
 	}
-	packet := fmt.Sprintf(M_SEARCH, urn)
+	packet := fmt.Sprintf(MSEARCH, urn)
 
 	if w.Debug {
 		log.Printf("Writing discovery packet")
