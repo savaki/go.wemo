@@ -74,3 +74,15 @@ func newGetInsightParamsMessage() string {
   </s:Body>
 </s:Envelope>`
 }
+
+func newGetBridgeEndDevices(u string) string {
+	return fmt.Sprintf(`<?xml version="1.0" encoding="utf-8"?>
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <s:Body>
+		<u:GetEndDevices xmlns:u="urn:Belkin:service:bridge:1">
+			<DevUDN>%s</DevUDN>
+			<ReqListType>PAIRED_LIST</ReqListType>',
+		</u:GetEndDevices>
+  </s:Body>
+</s:Envelope>`, u)
+}

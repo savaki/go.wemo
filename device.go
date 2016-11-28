@@ -28,16 +28,15 @@ import (
 	"golang.org/x/net/context"
 
 	"github.com/savaki/httpctx"
-	//"golang.org/x/net/context"
 )
 
-// Device ...
+// Device struct
 type Device struct {
 	Host   string
 	Logger func(string, ...interface{}) (int, error)
 }
 
-// DeviceInfo ...
+// DeviceInfo struct
 type DeviceInfo struct {
 	Device          *Device `json:"-"`
 	DeviceType      string  `xml:"deviceType" json:"device-type"`
@@ -45,9 +44,10 @@ type DeviceInfo struct {
 	MacAddress      string  `xml:"macAddress" json:"mac-address"`
 	FirmwareVersion string  `xml:"firmwareVersion" json:"firmware-version"`
 	SerialNumber    string  `xml:"serialNumber" json:"serial-number"`
+	UDN             string  `xml:"UDN" json:"UDN"`
 }
 
-// DeviceInfos ...
+// DeviceInfos slice
 type DeviceInfos []*DeviceInfo
 
 func (d DeviceInfos) Len() int           { return len(d) }
@@ -72,7 +72,7 @@ func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
 	return &resp.DeviceInfo, nil
 }
 
-// FetchDeviceInfo ...
+// FetchDeviceInfo from device
 func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 	var data []byte
 
@@ -123,17 +123,17 @@ func (d *Device) GetBinaryState() int {
 	return result
 }
 
-// Off ...
+// Off toggle state to Off
 func (d *Device) Off() {
 	d.changeState(false)
 }
 
-// On ...
+// On toggle state to On
 func (d *Device) On() {
 	d.changeState(true)
 }
 
-// Toggle ...
+// Toggle state
 func (d *Device) Toggle() {
 	if binaryState := d.GetBinaryState(); binaryState == 0 {
 		d.On()
@@ -218,4 +218,43 @@ func (d *Device) GetInsightParams() *InsightParams {
 	return &InsightParams{
 		Power: power,
 	}
+}
+
+// EndDevice ...
+type EndDevice struct {
+	DeviceID        string `xml:"DeviceID"`
+	FriendlyName    string `xml:"FriendlyName"`
+	FirmwareVersion string `xml:"FirmwareVersion"`
+	CapabilityIDs   string `xml:"CapabilityIDs"`
+	CurrentState    string `xml:"CurrentState"`
+	Manufacturer    string `xml:"Manufacturer"`
+	ModelCode       string `xml:"ModelCode"`
+	ProductName     string `xml:"productName"`
+	WeMoCertified   string `xml:"WeMoCertified"`
+}
+
+// GetBridgeEndDevices ...
+func (d *Device) GetBridgeEndDevices(uuid string) {
+	a := "GetEndDevices"
+	b := newGetBridgeEndDevices(uuid)
+
+	response, err := post(d.Host, "bridge", a, b)
+	if err != nil {
+		d.printf("unable to fetch bridge end devices => %s\n", err)
+		//return nil
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		d.printf("GetBridgeEndDevices returned status code => %d\n", response.StatusCode)
+		//return nil
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		d.printf("unable to read data => %s\n", err)
+		//return nil
+	}
+
+	fmt.Println("Response Body:", string(data))
 }

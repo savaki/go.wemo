@@ -31,12 +31,12 @@ type Wemo struct {
 // DiscoverAll ...
 func (w *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
 	urns := []string{
+		"urn:Belkin:device:bridge:1",
 		"urn:Belkin:device:controllee:1",
 		"urn:Belkin:device:light:1",
 		"urn:Belkin:device:sensor:1",
 		"urn:Belkin:device:netcam:1",
 		"urn:Belkin:device:insight:1",
-		"urn:Belkin:device:bridge:1",
 	}
 
 	var all []*Device

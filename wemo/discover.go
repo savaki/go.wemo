@@ -37,18 +37,20 @@ func commandAction(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	format := "%-20s %-20s %-21s %-20s\n"
+	format := "%-22s %-22s %-34s %-16s %-16s\n"
 	fmt.Printf(format,
 		"Host",
 		"Friendly Name",
 		"Firmware Version",
 		"Serial Number",
+		"UDN",
 	)
 	fmt.Printf(format,
-		"----------------",
-		"----------------",
-		"----------------",
-		"----------------",
+		"--------------------",
+		"--------------------",
+		"--------------------------------",
+		"--------------",
+		"------------------------------",
 	)
 
 	deviceInfos := wemo.DeviceInfos{}
@@ -66,6 +68,11 @@ func commandAction(c *cli.Context) {
 			deviceInfo.Device.Host,
 			deviceInfo.FriendlyName,
 			deviceInfo.FirmwareVersion,
-			deviceInfo.SerialNumber)
+			deviceInfo.SerialNumber,
+			deviceInfo.UDN)
+
+		if deviceInfo.FriendlyName == "WeMo Link" {
+			deviceInfo.Device.GetBridgeEndDevices(deviceInfo.UDN)
+		}
 	}
 }
