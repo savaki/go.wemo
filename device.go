@@ -1,5 +1,5 @@
 // Package wemo ...
-// Copyright 2014 Matt Ho
+/* Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,12 +12,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+*/
 package wemo
 
 import (
 	"encoding/xml"
 	"errors"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -45,6 +47,7 @@ type DeviceInfo struct {
 	FirmwareVersion string  `xml:"firmwareVersion" json:"firmware-version"`
 	SerialNumber    string  `xml:"serialNumber" json:"serial-number"`
 	UDN             string  `xml:"UDN" json:"UDN"`
+	EndDevices      EndDevices
 }
 
 // DeviceInfos slice
@@ -88,6 +91,11 @@ func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
 	}
 
 	deviceInfo.Device = d
+
+	if deviceInfo.DeviceType == "urn:Belkin:device:bridge:1" {
+		deviceInfo.EndDevices = *deviceInfo.Device.GetBridgeEndDevices(deviceInfo.UDN)
+	}
+
 	return deviceInfo, nil
 }
 
@@ -220,8 +228,15 @@ func (d *Device) GetInsightParams() *InsightParams {
 	}
 }
 
-// EndDevice ...
-type EndDevice struct {
+// EndDevices ...
+type EndDevices struct {
+	DeviceListType string          `xml:"Body>GetEndDevicesResponse>DeviceLists>DeviceLists>DeviceList>DeviceListType"`
+	EndDeviceInfo  []EndDeviceInfo `xml:"Body>GetEndDevicesResponse>DeviceLists>DeviceLists>DeviceList>DeviceInfos>DeviceInfo"`
+}
+
+// EndDeviceInfo ...
+type EndDeviceInfo struct {
+	DeviceIndex     string `xml:"DeviceIndex"`
 	DeviceID        string `xml:"DeviceID"`
 	FriendlyName    string `xml:"FriendlyName"`
 	FirmwareVersion string `xml:"FirmwareVersion"`
@@ -234,27 +249,33 @@ type EndDevice struct {
 }
 
 // GetBridgeEndDevices ...
-func (d *Device) GetBridgeEndDevices(uuid string) {
+func (d *Device) GetBridgeEndDevices(uuid string) *EndDevices {
 	a := "GetEndDevices"
 	b := newGetBridgeEndDevices(uuid)
 
 	response, err := post(d.Host, "bridge", a, b)
 	if err != nil {
 		d.printf("unable to fetch bridge end devices => %s\n", err)
-		//return nil
 	}
 	defer response.Body.Close()
 
 	if response.StatusCode != http.StatusOK {
 		d.printf("GetBridgeEndDevices returned status code => %d\n", response.StatusCode)
-		//return nil
 	}
 
 	data, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		d.printf("unable to read data => %s\n", err)
-		//return nil
 	}
 
-	fmt.Println("Response Body:", string(data))
+	resp := EndDevices{}
+
+	data = []byte(html.UnescapeString(string(data)))
+
+	err = xml.Unmarshal(data, &resp)
+	if err != nil {
+		d.printf("Unmarshal Error: %s\n", err)
+	}
+
+	return &resp
 }

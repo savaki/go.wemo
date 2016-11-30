@@ -1,42 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
   <s:Body>
     <u:GetEndDevicesResponse xmlns:u="urn:Belkin:service:bridge:1">
       <DeviceLists>
-      &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;&lt;
-      DeviceLists&gt;&lt;DeviceList&gt;&lt;
-        DeviceListType&gt;
-          Paired&lt;
-        /DeviceListType&gt;&lt;
-        DeviceInfos&gt;&lt;DeviceInfo&gt;&lt;
-          DeviceIndex&gt;0&lt;/DeviceIndex&gt;&lt;
-            DeviceID&gt;94103EF6BF42867F&lt;/DeviceID&gt;&lt;
-            FriendlyName&gt;Rear Lamp&lt;/FriendlyName&gt;&lt;
-            IconVersion&gt;1&lt;/IconVersion&gt;&lt;
-            FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;
-            CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;
-            CurrentState&gt;1,147:0,9000:1478168812,,&lt;/CurrentState&gt;&lt;
-            Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;
-            ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;
-            productName&gt;Lighting&lt;/productName&gt;&lt;
-            WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;
-        /DeviceInfo&gt;&lt;
-        DeviceInfo&gt;&lt;
-        DeviceIndex&gt;1&lt;
-        /DeviceIndex&gt;&lt;
-                DeviceID&gt;94103EF6BF42CFA6&lt;/DeviceID&gt;&lt;
-                FriendlyName&gt;Front Lamp&lt;/FriendlyName&gt;&lt;
-                IconVersion&gt;1&lt;/IconVersion&gt;&lt;
-                FirmwareVersion&gt;83&lt;/FirmwareVersion&gt;&lt;
-                CapabilityIDs&gt;10006,10008,30008,30009,3000A&lt;/CapabilityIDs&gt;&lt;
-                CurrentState&gt;0,255:0,0:0,,&lt;/CurrentState&gt;&lt;
-                Manufacturer&gt;MRVL&lt;/Manufacturer&gt;&lt;
-                ModelCode&gt;MZ100&lt;/ModelCode&gt;&lt;
-                productName&gt;Lighting&lt;/productName&gt;&lt;
-                WeMoCertified&gt;YES&lt;/WeMoCertified&gt;&lt;
-              /DeviceInfo&gt;&lt;
-            /DeviceInfos&gt;&lt;
-          /DeviceList&gt;&lt;
-        /DeviceLists&gt;
+        <?xml version="1.0" encoding="utf-8"?>
+        <DeviceLists>
+          <DeviceList>
+            <DeviceListType>Paired</DeviceListType>
+            <DeviceInfos>
+              <DeviceInfo>
+                <DeviceIndex>0</DeviceIndex>
+                <DeviceID>94103EF6BF42867F</DeviceID>
+                <FriendlyName>Rear Lamp</FriendlyName>
+                <IconVersion>1</IconVersion>
+                <FirmwareVersion>83</FirmwareVersion>
+                <CapabilityIDs>10006,10008,30008,30009,3000A</CapabilityIDs>
+                <CurrentState>0,158:0,0:1480358983,,</CurrentState>
+                <Manufacturer>MRVL</Manufacturer>
+                <ModelCode>MZ100</ModelCode>
+                <productName>Lighting</productName>
+                <WeMoCertified>YES</WeMoCertified>
+              </DeviceInfo>
+              <DeviceInfo>
+                <DeviceIndex>1</DeviceIndex>
+                <DeviceID>94103EF6BF42CFA6</DeviceID>
+                <FriendlyName>Front Lamp</FriendlyName>
+                <IconVersion>1</IconVersion>
+                <FirmwareVersion>83</FirmwareVersion>
+                <CapabilityIDs>10006,10008,30008,30009,3000A</CapabilityIDs>
+                <CurrentState>0,255:0,0:0,,</CurrentState>
+                <Manufacturer>MRVL</Manufacturer>
+                <ModelCode>MZ100</ModelCode>
+                <productName>Lighting</productName>
+                <WeMoCertified>YES</WeMoCertified>
+              </DeviceInfo>
+            </DeviceInfos>
+          </DeviceList>
+        </DeviceLists>
       </DeviceLists>
     </u:GetEndDevicesResponse>
   </s:Body>

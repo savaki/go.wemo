@@ -43,14 +43,14 @@ func commandAction(c *cli.Context) {
 		"Friendly Name",
 		"Firmware Version",
 		"Serial Number",
-		"UDN",
+		"EndDevices",
 	)
 	fmt.Printf(format,
 		"--------------------",
 		"--------------------",
 		"--------------------------------",
 		"--------------",
-		"------------------------------",
+		"----------",
 	)
 
 	deviceInfos := wemo.DeviceInfos{}
@@ -69,10 +69,6 @@ func commandAction(c *cli.Context) {
 			deviceInfo.FriendlyName,
 			deviceInfo.FirmwareVersion,
 			deviceInfo.SerialNumber,
-			deviceInfo.UDN)
-
-		if deviceInfo.FriendlyName == "WeMo Link" {
-			deviceInfo.Device.GetBridgeEndDevices(deviceInfo.UDN)
-		}
+			deviceInfo.EndDevices.DeviceListType)
 	}
 }
