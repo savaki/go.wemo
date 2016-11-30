@@ -250,10 +250,9 @@ type EndDeviceInfo struct {
 
 // GetBridgeEndDevices ...
 func (d *Device) GetBridgeEndDevices(uuid string) *EndDevices {
-	a := "GetEndDevices"
 	b := newGetBridgeEndDevices(uuid)
 
-	response, err := post(d.Host, "bridge", a, b)
+	response, err := post(d.Host, "bridge", "GetEndDevices", b)
 	if err != nil {
 		d.printf("unable to fetch bridge end devices => %s\n", err)
 	}
