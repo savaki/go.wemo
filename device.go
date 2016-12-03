@@ -151,7 +151,6 @@ func (d *Device) Toggle() {
 }
 
 func (d *Device) changeState(newState bool) error {
-	fmt.Printf("changeState(%v)\n", newState)
 
 	message := newSetBinaryStateMessage(newState)
 	response, err := post(d.Host, "basicevent", "SetBinaryState", message)
@@ -276,5 +275,52 @@ func (d *Device) GetBridgeEndDevices(uuid string) *EndDevices {
 		d.printf("Unmarshal Error: %s\n", err)
 	}
 
+	fmt.Println(resp)
 	return &resp
+}
+
+//Bulb ...
+func (d *Device) Bulb(id, cmd, value string, group bool) error {
+
+	if id == "" {
+		return errors.New("No ID provided")
+	}
+
+	capability := "10006"
+	if cmd == "dim" {
+		capability = "10008"
+
+		s, err := strconv.ParseInt(value, 10, 32)
+		if err != nil {
+			return err
+		}
+
+		if s > 255 || s < 0 {
+			return errors.New("Dim value is out of bounds 0-255")
+		}
+	}
+
+	if cmd == "on" {
+		value = "1"
+	} else if cmd == "off" {
+		value = "0"
+	}
+
+	message := newSetBulbStatus(id, capability, value, group)
+
+	response, err := post(d.Host, "bridge", "SetDeviceStatus", message)
+	if err != nil {
+		return errors.New("unable to SetDeviceStatus")
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != 200 {
+		_, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return errors.New("couldn't read body from message => " + err.Error())
+		}
+
+		return errors.New(string(response.StatusCode))
+	}
+	return nil
 }

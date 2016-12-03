@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/codegangsta/cli"
 	"github.com/danward79/go.wemo"
 )
@@ -8,7 +10,7 @@ import (
 var onCommand = cli.Command{
 	Name: "on",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "host", Value: "192.168.1.8:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
 	},
 	Action: onAction,
 }
@@ -51,4 +53,41 @@ func toggleAction(c *cli.Context) {
 		Host: host,
 	}
 	device.Toggle()
+}
+
+var bulbCommand = cli.Command{
+	Name:        "bulb",
+	Usage:       "Command a bulb!",
+	Description: "bulb --host 192.168.1.25:49153 dim 255",
+	Flags: []cli.Flag{
+		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		//cli.StringFlag{Name: "fname", Value: "", Usage: "friendly name"},
+		cli.StringFlag{Name: "id", Value: "", Usage: "device id"},
+	},
+	Action: bulbAction,
+}
+
+func bulbAction(c *cli.Context) {
+	host := c.String("host")
+	//friendlyName := c.String("fname")
+	id := c.String("id")
+	args := c.Args()
+
+	var cmd, value string
+	if len(args) > 0 {
+		cmd = args[0]
+
+		if cmd == "dim" {
+			value = args[1]
+		}
+	}
+
+	device := &wemo.Device{
+		Host: host,
+	}
+
+	err := device.Bulb(id, cmd, value, false)
+	if err != nil {
+		log.Println(err)
+	}
 }

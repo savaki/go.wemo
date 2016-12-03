@@ -18,7 +18,7 @@ var discoverCommand = cli.Command{
 	Flags: []cli.Flag{
 		cli.StringFlag{Name: "interface", Value: "en0", Usage: "search by interface"}, //, ""},
 		cli.StringFlag{Name: "ip", Value: "", Usage: "discovery wemo by ip"},          //,""},
-		cli.IntFlag{Name: "timeout", Value: 3, Usage: "timeout"},                      //, ""},
+		cli.IntFlag{Name: "timeout", Value: 2, Usage: "timeout"},                      //, ""},
 	},
 	Action: commandAction,
 }
