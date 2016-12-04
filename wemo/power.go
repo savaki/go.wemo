@@ -113,5 +113,12 @@ func bulbStatusAction(c *cli.Context) {
 		Host: host,
 	}
 
-	fmt.Println(device.GetBulbStatus(id))
+	result, err := device.GetBulbStatus(id)
+	if err != nil {
+		log.Println(err)
+	}
+
+	for k, v := range result {
+		fmt.Println("DeviceID:", k, "State:", v)
+	}
 }

@@ -335,7 +335,7 @@ type DeviceStatus struct {
 	CapabilityValue string `xml:"CapabilityValue"`
 }
 
-//GetBulbStatus return map of [DeviceID]status values
+//GetBulbStatus return map of [DeviceID]status values, function returns a map of deviceid to status as it is possible to have several DeviceID results returned.
 func (d *Device) GetBulbStatus(ids string) (map[string]string, error) {
 	result := make(map[string]string)
 	message := newGetBulbStatus(ids)
