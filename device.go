@@ -275,7 +275,6 @@ func (d *Device) GetBridgeEndDevices(uuid string) *EndDevices {
 		d.printf("Unmarshal Error: %s\n", err)
 	}
 
-	fmt.Println(resp)
 	return &resp
 }
 
@@ -323,4 +322,50 @@ func (d *Device) Bulb(id, cmd, value string, group bool) error {
 		return errors.New(string(response.StatusCode))
 	}
 	return nil
+}
+
+//BulbStatusList ...
+type BulbStatusList struct {
+	DeviceStatus []DeviceStatus `xml:"Body>GetDeviceStatusResponse>DeviceStatusList>DeviceStatusList>DeviceStatus"`
+}
+
+//DeviceStatus ...
+type DeviceStatus struct {
+	DeviceID        string `xml:"DeviceID"`
+	CapabilityValue string `xml:"CapabilityValue"`
+}
+
+//GetBulbStatus return map of [DeviceID]status values
+func (d *Device) GetBulbStatus(ids string) (map[string]string, error) {
+	result := make(map[string]string)
+	message := newGetBulbStatus(ids)
+
+	response, err := post(d.Host, "bridge", "GetDeviceStatus", message)
+	if err != nil {
+		return nil, fmt.Errorf("unable to fetch Bulb status => %s\n", err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("GetBulbStatus returned status code => %d\n", response.StatusCode)
+	}
+
+	data, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("unable to read data => %s\n", err)
+	}
+
+	data = []byte(html.UnescapeString(string(data)))
+
+	statusInfo := BulbStatusList{}
+	err = xml.Unmarshal(data, &statusInfo)
+	if err != nil {
+		return nil, fmt.Errorf("Unmarshal Error: %s\n", err)
+	}
+
+	for k := range statusInfo.DeviceStatus {
+		result[statusInfo.DeviceStatus[k].DeviceID] = statusInfo.DeviceStatus[k].CapabilityValue
+	}
+
+	return result, nil
 }

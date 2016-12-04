@@ -81,5 +81,11 @@ func newSetBulbStatus(id, capability, value string, group bool) string {
 		</DeviceStatusList>
 	</u:SetDeviceStatus>`+
 		messageFooter, g, id, capability, value)
+}
+
+func newGetBulbStatus(id string) string {
+	return fmt.Sprintf(messageHeader+`<u:GetDeviceStatus xmlns:u="urn:Belkin:service:bridge:1">
+		<DeviceIDs>%s</DeviceIDs>
+		</u:GetDeviceStatus>`+messageFooter, id)
 
 }

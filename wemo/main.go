@@ -32,6 +32,7 @@ func main() {
 		offCommand,
 		toggleCommand,
 		bulbCommand,
+		bulbStatusCommand,
 	}
 	app.Run(os.Args)
 }

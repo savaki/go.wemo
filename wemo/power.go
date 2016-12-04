@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/codegangsta/cli"
@@ -90,4 +91,27 @@ func bulbAction(c *cli.Context) {
 	if err != nil {
 		log.Println(err)
 	}
+
+}
+
+var bulbStatusCommand = cli.Command{
+	Name:        "bulbStatus",
+	Usage:       "Status of a bulb!",
+	Description: "bulb --host 192.168.1.25:49153 --id 94103EF6BF42867F",
+	Flags: []cli.Flag{
+		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "id", Value: "", Usage: "device id"},
+	},
+	Action: bulbStatusAction,
+}
+
+func bulbStatusAction(c *cli.Context) {
+	host := c.String("host")
+	id := c.String("id")
+
+	device := &wemo.Device{
+		Host: host,
+	}
+
+	fmt.Println(device.GetBulbStatus(id))
 }

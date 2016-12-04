@@ -118,7 +118,8 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 				d.UnSubscribe(id)
 
 				// Setup a new subscription, if this fails, next attempt will be when timer triggers again
-				newID, err := d.Subscribe(listenerAddress, timeout)
+				var newID string
+				newID, err = d.Subscribe(listenerAddress, timeout)
 				if err != 200 {
 					log.Println("Error with subscription attempt: ", err)
 				} else {
