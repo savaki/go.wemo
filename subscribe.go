@@ -138,7 +138,6 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 	}()
 
 	return id, err
-
 }
 
 //Subscribe to the device event emitter, return the Subscription ID (sid) and StatusCode

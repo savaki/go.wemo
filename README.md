@@ -120,3 +120,6 @@ func main() {
 
 }
 ```
+
+Device info can be found at:
+http://192.168.1.25:49153/setup.xml

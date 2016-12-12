@@ -20,8 +20,20 @@ import (
 	"time"
 )
 
-//var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
-var belkinRE = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+//Constants for URNS
+const (
+	Bridge     = "urn:Belkin:device:bridge:1"
+	Controllee = "urn:Belkin:device:controllee:1"
+	Light      = "urn:Belkin:device:light:1"
+	Sensor     = "urn:Belkin:device:sensor:1"
+	NetCam     = "urn:Belkin:device:netcam:1"
+	Insight    = "urn:Belkin:device:insight:1"
+)
+
+var (
+	//var belkinRE *regexp.Regexp = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+	belkinRE = regexp.MustCompile(`http://([^/]+)/setup.xml`)
+)
 
 // Wemo ...
 type Wemo struct {
@@ -31,14 +43,7 @@ type Wemo struct {
 
 // DiscoverAll ...
 func (w *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
-	urns := []string{
-		"urn:Belkin:device:bridge:1",
-		"urn:Belkin:device:controllee:1",
-		"urn:Belkin:device:light:1",
-		"urn:Belkin:device:sensor:1",
-		"urn:Belkin:device:netcam:1",
-		"urn:Belkin:device:insight:1",
-	}
+	urns := []string{Bridge, Controllee, Light, Sensor, NetCam, Insight}
 
 	var all []*Device
 	for _, urn := range urns {
