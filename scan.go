@@ -23,13 +23,11 @@ import (
 	"time"
 )
 
+//Constants associated with Scanning
 const (
-	// SSDPBROADCAST ...
 	SSDPBROADCAST = "239.255.255.250:1900"
-	// MSEARCH ...
-	MSEARCH = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
-	// LOCATION ...
-	LOCATION = "LOCATION: "
+	MSEARCH       = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
+	LOCATION      = "LOCATION: "
 )
 
 // scan the multicast

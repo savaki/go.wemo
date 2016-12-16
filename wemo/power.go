@@ -11,7 +11,7 @@ import (
 var onCommand = cli.Command{
 	Name: "on",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "192.168.1.8:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "host", Value: "192.168.1.8:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 	},
 	Action: onAction,
 }
@@ -27,7 +27,7 @@ func onAction(c *cli.Context) {
 var offCommand = cli.Command{
 	Name: "off",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 	},
 	Action: offAction,
 }
@@ -43,7 +43,7 @@ func offAction(c *cli.Context) {
 var toggleCommand = cli.Command{
 	Name: "toggle",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 	},
 	Action: toggleAction,
 }
@@ -61,8 +61,7 @@ var bulbCommand = cli.Command{
 	Usage:       "Command a bulb!",
 	Description: "bulb --host 192.168.1.25:49153 dim 255",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
-		//cli.StringFlag{Name: "fname", Value: "", Usage: "friendly name"},
+		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 		cli.StringFlag{Name: "id", Value: "", Usage: "device id"},
 	},
 	Action: bulbAction,
@@ -70,7 +69,6 @@ var bulbCommand = cli.Command{
 
 func bulbAction(c *cli.Context) {
 	host := c.String("host")
-	//friendlyName := c.String("fname")
 	id := c.String("id")
 	args := c.Args()
 
@@ -99,7 +97,7 @@ var bulbStatusCommand = cli.Command{
 	Usage:       "Status of a bulb!",
 	Description: "bulb --host 192.168.1.25:49153 --id 94103EF6BF42867F",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"}, //, ""},
+		cli.StringFlag{Name: "host", Value: "192.168.1.25:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 		cli.StringFlag{Name: "id", Value: "", Usage: "device id"},
 	},
 	Action: bulbStatusAction,

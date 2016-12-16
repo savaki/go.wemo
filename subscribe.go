@@ -53,16 +53,16 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 
 	http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request) {
 
+		fmt.Println("/Listener....")
+
 		eventxml := Deviceevent{}
 
 		if r.Method == "NOTIFY" {
-
 			body, err := ioutil.ReadAll(r.Body)
 			if err == nil {
 
 				err := xml.Unmarshal([]byte(body), &eventxml)
 				if err != nil {
-
 					log.Println("Unmarshal error: ", err)
 					return
 				}
@@ -103,12 +103,12 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 		return "", err
 	}
 	subscriptions[id] = &SubscriptionInfo{*info, false, timeout, id, d.Host}
-
+	offset := 30 //Renew early by offset seconds
 	// Setup resubscription timer
-	timer := time.NewTimer(time.Second * time.Duration(timeout))
+	timer := time.NewTimer(time.Second * time.Duration(timeout-offset))
 	go func() (string, int) {
 		for _ = range timer.C {
-			timer.Reset(time.Second * time.Duration(timeout))
+			timer.Reset(time.Second * time.Duration(timeout-offset))
 
 			// Resubscribe
 			_, err = d.ReSubscribe(id, timeout)
@@ -172,19 +172,13 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		//log.Println("Subscription Successful: ", d.Host, resp.StatusCode)
+	log.Println(statusMessage("Subscription", d.Host, resp.StatusCode))
+
+	if resp.StatusCode == http.StatusOK {
 		return resp.Header.Get("Sid"), resp.StatusCode
-	} else if resp.StatusCode == 400 {
-		log.Println("Subscription Unsuccessful, Incompatible header fields: ", d.Host, resp.StatusCode)
-	} else if resp.StatusCode == 412 {
-		log.Println("Subscription Unsuccessful, Precondition Failed: ", d.Host, resp.StatusCode)
-	} else {
-		log.Println("Subscription Unsuccessful, Unable to accept renewal: ", d.Host, resp.StatusCode)
 	}
 
 	return "", resp.StatusCode
-
 }
 
 //UnSubscribe According to the spec all subscribers must unsubscribe when the publisher is no longer required to provide state updates. Return the StatusCode
@@ -213,18 +207,9 @@ func (d *Device) UnSubscribe(sid string) int {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		//log.Println("Unsubscription Successful: ", d.Host, resp.StatusCode)
-	} else if resp.StatusCode == 400 {
-		log.Println("Unsubscription Unsuccessful, Incompatible header fields: ", d.Host, resp.StatusCode)
-	} else if resp.StatusCode == 412 {
-		log.Println("Unsubscription Unsuccessful, Precondition Failed: ", d.Host, resp.StatusCode)
-	} else {
-		log.Println("Unsubscription Unsuccessful, Unable to accept renewal: ", d.Host, resp.StatusCode)
-	}
+	log.Println(statusMessage("Unsubscription", d.Host, resp.StatusCode))
 
 	return resp.StatusCode
-
 }
 
 //ReSubscribe The subscription to the device must be renewed before the timeout. Return the Subscription ID (sid) and StatusCode
@@ -258,17 +243,24 @@ func (d *Device) ReSubscribe(sid string, timeout int) (string, int) {
 	}
 	defer resp.Body.Close()
 
-	if resp.StatusCode == 200 {
-		//log.Println("Resubscription Successful: ", resp.StatusCode)
+	log.Println(statusMessage("Resubscription", d.Host, resp.StatusCode))
+
+	if resp.StatusCode == http.StatusOK {
 		return resp.Header.Get("Sid"), resp.StatusCode
-	} else if resp.StatusCode == 400 {
-		log.Println("Resubscription Unsuccessful, Incompatible header fields: ", d.Host, resp.StatusCode)
-	} else if resp.StatusCode == 412 {
-		log.Println("Resubscription Unsuccessful, Precondition Failed: ", d.Host, resp.StatusCode)
-	} else {
-		log.Println("Resubscription Unsuccessful, Unable to accept renewal: ", d.Host, resp.StatusCode)
 	}
 
 	return "", resp.StatusCode
+}
 
+func statusMessage(action, host string, statusCode int) string {
+	switch statusCode {
+	case http.StatusOK:
+		return fmt.Sprintf("%s Successful: %d", action, statusCode)
+	case http.StatusBadRequest:
+		return fmt.Sprintf("%s Unsuccessful, Incompatible header fields: %s, %d", action, host, statusCode)
+	case http.StatusPreconditionFailed:
+		return fmt.Sprintf("%s Unsuccessful, Precondition Failed: %s, %d", action, host, statusCode)
+	default:
+		return fmt.Sprintf("%s Unsuccessful, Unable to accept renewal: %s, %d", action, host, statusCode)
+	}
 }
