@@ -159,7 +159,7 @@ func (d *Device) changeState(newState bool) error {
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
+	if response.StatusCode != http.StatusOK {
 		data, err := ioutil.ReadAll(response.Body)
 		if err != nil {
 			log.Println("couldn't read body from message => " + err.Error())
@@ -312,12 +312,7 @@ func (d *Device) Bulb(id, cmd, value string, group bool) error {
 	}
 	defer response.Body.Close()
 
-	if response.StatusCode != 200 {
-		_, err := ioutil.ReadAll(response.Body)
-		if err != nil {
-			return errors.New("couldn't read body from message => " + err.Error())
-		}
-
+	if response.StatusCode != http.StatusOK {
 		return errors.New(string(response.StatusCode))
 	}
 	return nil
