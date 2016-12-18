@@ -16,10 +16,10 @@ package wemo
 import (
 	"encoding/xml"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	"time"
 
 	"golang.org/x/net/context"
@@ -28,22 +28,30 @@ import (
 //SubscriptionInfo struct
 type SubscriptionInfo struct {
 	DeviceInfo
-	State   bool
-	Timeout int
-	Sid     string
-	Host    string
+	Timeout     int
+	Sid         string
+	Host        string
+	Deviceevent Deviceevent
 }
 
 //Deviceevent Structure for XML to Parse to
 type Deviceevent struct {
-	XMLName     xml.Name `xml:"propertyset"`
-	BinaryState string   `xml:"property>BinaryState"`
+	XMLName     xml.Name   `xml:"propertyset"`
+	BinaryState string     `xml:"property>BinaryState"`
+	StateEvent  StateEvent `xml:"property>StatusChange>StateEvent"`
+}
+
+//StateEvent ...
+type StateEvent struct {
+	DeviceID     string `xml:"DeviceID"`
+	CapabilityID string `xml:"CapabilityId"`
+	Value        string `xml:"Value"`
 }
 
 //SubscriptionEvent Structure for sending subscribed event data with
 type SubscriptionEvent struct {
-	Sid   string
-	State bool
+	Sid         string
+	Deviceevent Deviceevent
 }
 
 //Listener Listen for incomming subscribed state changes.
@@ -52,27 +60,23 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 	log.Println("Listening... ", listenerAddress)
 
 	http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request) {
-
-		fmt.Println("/Listener....")
-
-		eventxml := Deviceevent{}
-
+		fmt.Println("Response Method:", r.Method)
 		if r.Method == "NOTIFY" {
-			body, err := ioutil.ReadAll(r.Body)
-			if err == nil {
-
-				err := xml.Unmarshal([]byte(body), &eventxml)
-				if err != nil {
-					log.Println("Unmarshal error: ", err)
-					return
-				}
-
-				b, err := strconv.ParseBool(eventxml.BinaryState)
-				if err == nil {
-					cs <- SubscriptionEvent{r.Header.Get("Sid"), b}
-				}
-
-			}
+			go emitEvent(r, cs)
+			// body, err := ioutil.ReadAll(r.Body)
+			// if err == nil {
+			//
+			// 	eventxml := Deviceevent{}
+			// 	err := xml.Unmarshal([]byte(html.UnescapeString(string(body))), &eventxml)
+			// 	if err != nil {
+			// 		log.Println("Unmarshal error: ", err)
+			// 		return
+			// 	}
+			//
+			// 	if err == nil {
+			// 		cs <- SubscriptionEvent{r.Header.Get("Sid"), eventxml}
+			// 	}
+			// }
 		}
 	})
 
@@ -96,30 +100,38 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 
 	// Initial Subscribe
 	info, _ := d.FetchDeviceInfo(context.Background())
+	address := fmt.Sprintf("http://%s/upnp/event/basicevent1", d.Host)
+	path := "/upnp/event/basicevent1"
+	if info.DeviceType == "urn:Belkin:device:bridge:1" {
+		address = fmt.Sprintf("http://%s/upnp/event/bridge1", d.Host)
+		path = "/upnp/event/bridge1"
+	}
 
-	id, err := d.Subscribe(listenerAddress, timeout)
+	id, err := d.Subscribe(listenerAddress, address, path, timeout)
 	if err != 200 {
 		log.Println("Error with initial subscription: ", err)
 		return "", err
 	}
-	subscriptions[id] = &SubscriptionInfo{*info, false, timeout, id, d.Host}
-	offset := 30 //Renew early by offset seconds
+	fmt.Println("Returned ID", id)
+	subscriptions[id] = &SubscriptionInfo{*info, timeout, id, d.Host, Deviceevent{}}
+
 	// Setup resubscription timer
+	offset := 30 //Renew early by offset seconds
 	timer := time.NewTimer(time.Second * time.Duration(timeout-offset))
 	go func() (string, int) {
 		for _ = range timer.C {
 			timer.Reset(time.Second * time.Duration(timeout-offset))
 
 			// Resubscribe
-			_, err = d.ReSubscribe(id, timeout)
+			_, err = d.ReSubscribe(id, address, timeout)
 			if err != 200 {
 
 				// Failed to resubscribe so try unsubscribe, it is likely to fail but don't care.
-				d.UnSubscribe(id)
+				d.UnSubscribe(id, address)
 
 				// Setup a new subscription, if this fails, next attempt will be when timer triggers again
 				var newID string
-				newID, err = d.Subscribe(listenerAddress, timeout)
+				newID, err = d.Subscribe(listenerAddress, address, path, timeout)
 				if err != 200 {
 					log.Println("Error with subscription attempt: ", err)
 				} else {
@@ -128,7 +140,8 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 					if ok == false {
 						delete(subscriptions, id)
 					}
-					subscriptions[newID] = &SubscriptionInfo{*info, false, timeout, newID, d.Host}
+
+					subscriptions[newID] = &SubscriptionInfo{*info, timeout, newID, d.Host, Deviceevent{}}
 					id = newID
 				}
 
@@ -141,9 +154,7 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 }
 
 //Subscribe to the device event emitter, return the Subscription ID (sid) and StatusCode
-func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
-
-	address := fmt.Sprintf("http://%s/upnp/event/basicevent1", d.Host)
+func (d *Device) Subscribe(listenerAddress, address, path string, timeout int) (string, int) {
 
 	if timeout == 0 {
 		timeout = 300
@@ -157,7 +168,7 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 	}
 
 	req.Header.Add("host", fmt.Sprintf("http://%s", d.Host))
-	req.Header.Add("path", "/upnp/event/basicevent1")
+	req.Header.Add("path", path)
 	req.Header.Add("callback", fmt.Sprintf("<http://%s/listener>", listenerAddress))
 	req.Header.Add("nt", "upnp:event")
 	req.Header.Add("timeout", fmt.Sprintf("Second-%d", timeout))
@@ -167,8 +178,7 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
-		//TODO:Check that this return is correct.
-		return "", 0
+		return "", 0 //TODO:Check that this return is correct.
 	}
 	defer resp.Body.Close()
 
@@ -182,9 +192,7 @@ func (d *Device) Subscribe(listenerAddress string, timeout int) (string, int) {
 }
 
 //UnSubscribe According to the spec all subscribers must unsubscribe when the publisher is no longer required to provide state updates. Return the StatusCode
-func (d *Device) UnSubscribe(sid string) int {
-
-	address := fmt.Sprintf("http://%s/upnp/event/basicevent1", d.Host)
+func (d *Device) UnSubscribe(sid, address string) int {
 
 	client := &http.Client{}
 
@@ -202,8 +210,7 @@ func (d *Device) UnSubscribe(sid string) int {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
-		//TODO:Check that this return is correct
-		return 0
+		return 0 //TODO:Check that this return is correct
 	}
 	defer resp.Body.Close()
 
@@ -213,9 +220,7 @@ func (d *Device) UnSubscribe(sid string) int {
 }
 
 //ReSubscribe The subscription to the device must be renewed before the timeout. Return the Subscription ID (sid) and StatusCode
-func (d *Device) ReSubscribe(sid string, timeout int) (string, int) {
-
-	address := fmt.Sprintf("http://%s/upnp/event/basicevent1", d.Host)
+func (d *Device) ReSubscribe(sid, address string, timeout int) (string, int) {
 
 	if timeout == 0 {
 		timeout = 300
@@ -238,8 +243,7 @@ func (d *Device) ReSubscribe(sid string, timeout int) (string, int) {
 	resp, err := client.Do(req)
 	if err != nil {
 		log.Println("Client Request Error: ", err)
-		//TODO:Check that this return is correct
-		return "", 0
+		return "", 0 //TODO:Check that this return is correct
 	}
 	defer resp.Body.Close()
 
@@ -255,12 +259,29 @@ func (d *Device) ReSubscribe(sid string, timeout int) (string, int) {
 func statusMessage(action, host string, statusCode int) string {
 	switch statusCode {
 	case http.StatusOK:
-		return fmt.Sprintf("%s Successful: %d", action, statusCode)
+		return fmt.Sprintf("%s Successful: %s, %d", action, host, statusCode)
 	case http.StatusBadRequest:
 		return fmt.Sprintf("%s Unsuccessful, Incompatible header fields: %s, %d", action, host, statusCode)
 	case http.StatusPreconditionFailed:
 		return fmt.Sprintf("%s Unsuccessful, Precondition Failed: %s, %d", action, host, statusCode)
 	default:
 		return fmt.Sprintf("%s Unsuccessful, Unable to accept renewal: %s, %d", action, host, statusCode)
+	}
+}
+
+func emitEvent(r *http.Request, cs chan SubscriptionEvent) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err == nil {
+
+		eventxml := Deviceevent{}
+		err := xml.Unmarshal([]byte(html.UnescapeString(string(body))), &eventxml)
+		if err != nil {
+			log.Println("Unmarshal error: ", err)
+			return
+		}
+
+		if err == nil {
+			cs <- SubscriptionEvent{r.Header.Get("Sid"), eventxml}
+		}
 	}
 }

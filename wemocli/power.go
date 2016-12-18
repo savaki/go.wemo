@@ -43,7 +43,7 @@ func offAction(c *cli.Context) {
 var toggleCommand = cli.Command{
 	Name: "toggle",
 	Flags: []cli.Flag{
-		cli.StringFlag{Name: "host", Value: "", Usage: "device host and ip e.g. 10.0.1.2:49128"},
+		cli.StringFlag{Name: "host", Value: "192.168.1.8:49153", Usage: "device host and ip e.g. 10.0.1.2:49128"},
 	},
 	Action: toggleAction,
 }

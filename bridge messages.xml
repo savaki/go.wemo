@@ -72,3 +72,17 @@ capabilities
     </u:GetDeviceStatusResponse>
   </s:Body>
 </s:Envelope>
+
+`xml:"property>StatusChange>StateEvent>DeviceID"`
+<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
+  <e:property>
+    <StatusChange>
+      <?xml version="1.0" encoding="utf-8"?>
+      <StateEvent>
+        <DeviceID available="YES">94103EF6BF42867F</DeviceID>
+        <CapabilityId>10006</CapabilityId>
+        <Value>1</Value>
+      </StateEvent>
+    </StatusChange>
+  </e:property>
+</e:propertyset>
