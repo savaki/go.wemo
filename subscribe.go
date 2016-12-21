@@ -60,29 +60,17 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 	log.Println("Listening... ", listenerAddress)
 
 	http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println("Response Method:", r.Method)
 		if r.Method == "NOTIFY" {
-			go emitEvent(r, cs)
-			// body, err := ioutil.ReadAll(r.Body)
-			// if err == nil {
-			//
-			// 	eventxml := Deviceevent{}
-			// 	err := xml.Unmarshal([]byte(html.UnescapeString(string(body))), &eventxml)
-			// 	if err != nil {
-			// 		log.Println("Unmarshal error: ", err)
-			// 		return
-			// 	}
-			//
-			// 	if err == nil {
-			// 		cs <- SubscriptionEvent{r.Header.Get("Sid"), eventxml}
-			// 	}
-			// }
+			err := emitEvent(r, cs)
+			if err != nil {
+				log.Println("Event emit error: ", err)
+			}
 		}
 	})
 
 	err := http.ListenAndServe(listenerAddress, nil)
 	if err != nil {
-		log.Println("From Listen and Serve an Err! ", err)
+		log.Println("From Listen and Serve Err! ", err)
 	}
 }
 
@@ -269,19 +257,19 @@ func statusMessage(action, host string, statusCode int) string {
 	}
 }
 
-func emitEvent(r *http.Request, cs chan SubscriptionEvent) {
+func emitEvent(r *http.Request, cs chan SubscriptionEvent) error {
 	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+
 	if err == nil {
-
 		eventxml := Deviceevent{}
-		err := xml.Unmarshal([]byte(html.UnescapeString(string(body))), &eventxml)
+		err = xml.Unmarshal([]byte(html.UnescapeString(string(body))), &eventxml)
 		if err != nil {
-			log.Println("Unmarshal error: ", err)
-			return
+			return err
 		}
 
-		if err == nil {
-			cs <- SubscriptionEvent{r.Header.Get("Sid"), eventxml}
-		}
+		cs <- SubscriptionEvent{r.Header.Get("Sid"), eventxml}
 	}
+
+	return err
 }
