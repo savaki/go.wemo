@@ -1,5 +1,4 @@
-// Package wemo ...
-/* Copyright 2014 Matt Ho
+// Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +11,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-*/
+
 package wemo
 
 import (
@@ -87,5 +86,4 @@ func newGetBulbStatus(id string) string {
 	return fmt.Sprintf(messageHeader+`<u:GetDeviceStatus xmlns:u="urn:Belkin:service:bridge:1">
 		<DeviceIDs>%s</DeviceIDs>
 		</u:GetDeviceStatus>`+messageFooter, id)
-
 }
