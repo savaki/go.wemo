@@ -36,7 +36,7 @@ func testNewSetBinaryStateMessage(state bool) func(*testing.T) {
 	return func(t *testing.T) {
 		actual := newSetBinaryStateMessage(state)
 		if actual != expected {
-			t.Error(fmt.Sprintf("Expected: %s, got: %s", expected, actual))
+			t.Errorf("Expected: %s, got: %s", expected, actual)
 		}
 	}
 }
@@ -91,7 +91,7 @@ func testNewSetBulbStatus(id, capability, value string, group bool) func(*testin
 	return func(t *testing.T) {
 		actual := newSetBulbStatus(id, capability, value, group)
 		if actual != expected {
-			t.Error(fmt.Sprintf("Expected: %s, got: %s", expected, actual))
+			t.Errorf("Expected: %s, got: %s", expected, actual)
 		}
 	}
 }
