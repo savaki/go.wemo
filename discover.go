@@ -22,6 +22,7 @@ import (
 
 //Constants for URNS
 const (
+	Basic      = "urn:Belkin:service:basicevent:1"
 	Bridge     = "urn:Belkin:device:bridge:1"
 	Controllee = "urn:Belkin:device:controllee:1"
 	Light      = "urn:Belkin:device:light:1"
@@ -43,8 +44,7 @@ type Wemo struct {
 
 // DiscoverAll ...
 func (w *Wemo) DiscoverAll(timeout time.Duration) ([]*Device, error) {
-	urns := []string{Bridge, Controllee, Light, Sensor, NetCam, Insight}
-
+	urns := []string{Basic, Bridge, Controllee, Light, Sensor, NetCam, Insight}
 	var all []*Device
 	for _, urn := range urns {
 		devices, _ := w.Discover(urn, timeout)
