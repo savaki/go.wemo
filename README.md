@@ -5,7 +5,14 @@ go.wemo
 [![Build Status](https://travis-ci.org/danward79/go.wemo.svg?branch=master)](https://travis-ci.org/danward79/go.wemo)
 
 
-Simple package to interface with Belkin wemo devices.
+Simple package to interface with Belkin wemo devices. That has forked from the original package.
+
+This package supports, Belkin Wemo:
+- Bridge & Bulbs
+- Sockets
+- Insight
+
+This package also includes a subscription to device events and adds basic device discovery.
 
 ### Example - Device discovery
 
