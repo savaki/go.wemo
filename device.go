@@ -149,6 +149,11 @@ func (d *Device) Toggle() {
 	}
 }
 
+// SetState is a wrapper for changeState, which allows errors to be exposed to caller.
+func (d *Device) SetState(newState bool) error {
+	return d.changeState(newState)
+}
+
 func (d *Device) changeState(newState bool) error {
 
 	message := newSetBinaryStateMessage(newState)
