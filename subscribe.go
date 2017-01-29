@@ -60,6 +60,8 @@ func Listener(listenerAddress string, cs chan SubscriptionEvent) {
 	log.Println("Listening... ", listenerAddress)
 
 	http.HandleFunc("/listener", func(w http.ResponseWriter, r *http.Request) {
+		defer r.Body.Close()
+
 		if r.Method == "NOTIFY" {
 			err := emitEvent(r, cs)
 			if err != nil {
@@ -100,7 +102,7 @@ func (d *Device) ManageSubscription(listenerAddress string, timeout int, subscri
 		log.Println("Error with initial subscription: ", err)
 		return "", err
 	}
-	fmt.Println("Returned ID", id)
+	//log.Println("Returned ID", id)
 	subscriptions[id] = &SubscriptionInfo{*info, timeout, id, d.Host, Deviceevent{}}
 
 	// Setup resubscription timer
@@ -259,7 +261,6 @@ func statusMessage(action, host string, statusCode int) string {
 
 func emitEvent(r *http.Request, cs chan SubscriptionEvent) error {
 	body, err := ioutil.ReadAll(r.Body)
-	defer r.Body.Close()
 
 	if err == nil {
 		eventxml := Deviceevent{}
