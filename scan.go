@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,16 +23,17 @@ import (
 	"time"
 )
 
+//Constants associated with Scanning
 const (
-	SSDP_BROADCAST = "239.255.255.250:1900"
-	M_SEARCH       = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
-	LOCATION       = "LOCATION: "
+	SSDPBROADCAST = "239.255.255.250:1900"
+	MSEARCH       = "M-SEARCH * HTTP/1.1\r\nHOST: 239.255.255.250:1900\r\nMAN: \"ssdp:discover\"\r\nMX: 10\r\nST: %s\r\nUSER-AGENT: unix/5.1 UPnP/1.1 crash/1.0\r\n\r\n"
+	LOCATION      = "LOCATION: "
 )
 
 // scan the multicast
-func (self *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
+func (w *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 	// open a udp port for us to receive multicast messages
-	udpAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:0", self.ipAddr))
+	udpAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:0", w.ipAddr))
 	if err != nil {
 		return nil, err
 	}
@@ -43,17 +45,17 @@ func (self *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 	defer udpConn.Close()
 
 	//send the
-	mAddr, err := net.ResolveUDPAddr("udp", SSDP_BROADCAST)
+	mAddr, err := net.ResolveUDPAddr("udp", SSDPBROADCAST)
 	if err != nil {
 		return nil, err
 	}
 
-	if self.Debug {
+	if w.Debug {
 		log.Printf("Found multi-cast address %v", mAddr)
 	}
-	packet := fmt.Sprintf(M_SEARCH, urn)
+	packet := fmt.Sprintf(MSEARCH, urn)
 
-	if self.Debug {
+	if w.Debug {
 		log.Printf("Writing discovery packet")
 	}
 	_, err = udpConn.WriteTo([]byte(packet), mAddr)
@@ -61,7 +63,7 @@ func (self *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 		return nil, err
 	}
 
-	if self.Debug {
+	if w.Debug {
 		log.Printf("Setting read deadline")
 	}
 	err = udpConn.SetReadDeadline(time.Now().Add(timeout))
@@ -89,7 +91,7 @@ func (self *Wemo) scan(urn string, timeout time.Duration) ([]*url.URL, error) {
 			}
 		}
 
-		if self.Debug {
+		if w.Debug {
 			log.Printf("Read : %v\n", string(buffer[:n]))
 		}
 	}

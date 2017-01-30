@@ -1,0 +1,89 @@
+setStatus
+
+<?xml version="1.0" encoding="utf-8"?>
+  <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+    <s:Body>
+      <u:SetDeviceStatus xmlns:u="urn:Belkin:service:bridge:1">
+        <DeviceStatusList>
+          &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;DeviceStatus&gt;&lt;IsGroupAction&gt;NO&lt;/IsGroupAction&gt;&lt;DeviceID available=&quot;YES&quot;&gt;%s&lt;/DeviceID&gt;&lt;CapabilityID&gt;%s&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;%s&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;
+        </DeviceStatusList>
+      </u:SetDeviceStatus>
+    </s:Body>
+  </s:Envelope>
+
+  <?xml version="1.0" encoding="UTF-8"?>
+    <DeviceStatus>
+      <IsGroupAction>NO</IsGroupAction>
+      <DeviceID available="YES">{devID}</DeviceID>
+      <CapabilityID>10006</CapabilityID>
+      <CapabilityValue>{state}</CapabilityValue>
+      <CapabilityID>10008</CapabilityID>
+      <CapabilityValue>{dim}</CapabilityValue>
+    </DeviceStatus>
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <DeviceStatus>
+      <IsGroupAction>NO</IsGroupAction>
+      <DeviceID available="YES">%s</DeviceID>
+      <CapabilityID>%s</CapabilityID>
+      <CapabilityValue>%s</CapabilityValue>
+    </DeviceStatus>
+
+setGroupStatus
+  <?xml version="1.0" encoding="utf-8"?>
+    <s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+      <s:Body>
+        <u:SetDeviceStatus xmlns:u="urn:Belkin:service:bridge:1">
+          <DeviceStatusList>
+            &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;&lt;DeviceStatus&gt;&lt;IsGroupAction&gt;YES&lt;/IsGroupAction&gt;&lt;DeviceID available=&quot;YES&quot;&gt;%s&lt;/DeviceID&gt;&lt;CapabilityID&gt;%s&lt;/CapabilityID&gt;&lt;CapabilityValue&gt;%s&lt;/CapabilityValue&gt;&lt;/DeviceStatus&gt;',
+          </DeviceStatusList>
+        </u:SetDeviceStatus>
+      </s:Body>
+    </s:Envelope>
+
+capabilities
+10006 On 0 (off) or 1 (on)
+10008 Dim 0-255 dark to bright
+30008 Sleep
+30009 Level Move (https://gist.github.com/hardillb/ec88e86597d65584b1ba)
+3000A ?
+
+<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/" s:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+  <s:Body>
+    <u:GetDeviceStatusResponse xmlns:u="urn:Belkin:service:bridge:1">
+      <DeviceStatusList>
+        <?xml version="1.0" encoding="utf-8"?>
+        <DeviceStatusList>
+          <DeviceStatus>
+            <IsGroupAction>NO</IsGroupAction>
+            <DeviceID available="YES">94103EF6BF42867F</DeviceID>
+            <CapabilityID>10006,10008,30008,30009,3000A</CapabilityID>
+            <CapabilityValue>1,200:0,0:1480683978,,</CapabilityValue>
+            <LastEventTimeStamp>0</LastEventTimeStamp>
+          </DeviceStatus>
+          <DeviceStatus>
+            <IsGroupAction>NO</IsGroupAction>
+            <DeviceID available="YES">94103EF6BF42CFA6</DeviceID>
+            <CapabilityID>10006,10008,30008,30009,3000A</CapabilityID>
+            <CapabilityValue>1,255:0,0:1480683978,,</CapabilityValue>
+            <LastEventTimeStamp>0</LastEventTimeStamp>
+          </DeviceStatus>
+        </DeviceStatusList>
+      </DeviceStatusList>
+    </u:GetDeviceStatusResponse>
+  </s:Body>
+</s:Envelope>
+
+`xml:"property>StatusChange>StateEvent>DeviceID"`
+<e:propertyset xmlns:e="urn:schemas-upnp-org:event-1-0">
+  <e:property>
+    <StatusChange>
+      <?xml version="1.0" encoding="utf-8"?>
+      <StateEvent>
+        <DeviceID available="YES">94103EF6BF42867F</DeviceID>
+        <CapabilityId>10006</CapabilityId>
+        <Value>1</Value>
+      </StateEvent>
+    </StatusChange>
+  </e:property>
+</e:propertyset>

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"code.google.com/p/go.net/context"
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/savaki/go.wemo"
 	"log"
 	"sort"
 	"time"
+
+	"github.com/codegangsta/cli"
+	"github.com/danward79/go.wemo"
+	"golang.org/x/net/context"
 )
 
 var discoverCommand = cli.Command{
@@ -15,9 +16,9 @@ var discoverCommand = cli.Command{
 	Usage:       "find devices in the local network",
 	Description: "search for devices in the local network",
 	Flags: []cli.Flag{
-		cli.StringFlag{"interface", "", "search by interface", ""},
-		cli.StringFlag{"ip", "", "discovery wemo by ip", ""},
-		cli.IntFlag{"timeout", 3, "timeout", ""},
+		cli.StringFlag{Name: "interface", Value: "en0", Usage: "search by interface"}, //, ""},
+		cli.StringFlag{Name: "ip", Value: "", Usage: "discovery wemo by ip"},          //,""},
+		cli.IntFlag{Name: "timeout", Value: 2, Usage: "timeout"},                      //, ""},
 	},
 	Action: commandAction,
 }
@@ -36,18 +37,20 @@ func commandAction(c *cli.Context) {
 		log.Fatal(err)
 	}
 
-	format := "%-20s %-20s %-21s %-20s\n"
+	format := "%-22s %-22s %-34s %-16s %-16s\n"
 	fmt.Printf(format,
 		"Host",
 		"Friendly Name",
 		"Firmware Version",
 		"Serial Number",
+		"EndDevices",
 	)
 	fmt.Printf(format,
-		"----------------",
-		"----------------",
-		"----------------",
-		"----------------",
+		"--------------------",
+		"--------------------",
+		"--------------------------------",
+		"--------------",
+		"----------",
 	)
 
 	deviceInfos := wemo.DeviceInfos{}
@@ -65,6 +68,7 @@ func commandAction(c *cli.Context) {
 			deviceInfo.Device.Host,
 			deviceInfo.FriendlyName,
 			deviceInfo.FirmwareVersion,
-			deviceInfo.SerialNumber)
+			deviceInfo.SerialNumber,
+			deviceInfo.EndDevices.DeviceListType)
 	}
 }

@@ -1,19 +1,27 @@
 go.wemo
 =======
 
-[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
-[![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
+[![GoDoc](http://godoc.org/github.com/danward79/go.wemo?status.png)](http://godoc.org/github.com/danward79/go.wemo)
+[![Build Status](https://travis-ci.org/danward79/go.wemo.svg?branch=master)](https://travis-ci.org/danward79/go.wemo)
 
-Simple package to interface with Belkin wemo devices.
+
+Simple package to interface with Belkin wemo devices. That has forked from the original package.
+
+This package supports, Belkin Wemo:
+- Bridge & Bulbs
+- Sockets
+- Insight
+
+This package also includes a subscription to device events and adds basic device discovery.
 
 ### Example - Device discovery
 
-```
+```go
 package main
 
 import (
 	"fmt"
-	"github.com/savaki/go.wemo"
+	"github.com/danward79/go.wemo"
 	"time"
 )
 
@@ -28,12 +36,12 @@ func main() {
 
 ### Example - Control a device
 
-```
+```go
 package main
 
 import (
   "fmt"
-  "github.com/savaki/go.wemo"
+  "github.com/danward79/go.wemo"
 )
 
 func main() {
@@ -49,7 +57,7 @@ func main() {
   device.On()
   device.Off()
   device.Toggle()
-  device.BinaryState() // returns 0 or 1
+  device.GetBinaryState() // returns 0 or 1
 }
 ```
 
@@ -57,11 +65,11 @@ func main() {
 
 As a convenience method, you can control lights through a more generic interface.
 
-```
+```go
 package main
 
 import (
-  "github.com/savaki/go.wemo"
+  "github.com/danward79/go.wemo"
   "time"
 )
 
@@ -72,3 +80,53 @@ func main() {
   api.Toggle("Left Light", 3*time.Second)
 }
 ```
+
+###Example - Managing Subscriptions
+
+This is an example of discovering devices, subscribing to there events and being notified of changed to there state. Resubscriptions are managed automatically at the timeout specified. Subscriber details and state are maintained in a map.
+
+```go
+package main
+
+import (
+	"github.com/danward79/go.wemo"
+	"time"
+  "log"
+)
+
+func main() {
+
+  listenerAddress := "192.168.0.6:6767"
+  timeout := 300
+
+  api, _ := wemo.NewByInterface("en0")
+
+  devices, _ := api.DiscoverAll(3*time.Second)
+
+  subscriptions := make(map[string]*wemo.SubscriptionInfo)
+
+  for _, device := range devices {
+    _, err := device.ManageSubscription(listenerAddress, timeout, subscriptions)
+    if err != 200 {
+      log.Println("Initial Error Subscribing: ", err)   
+    }
+  }
+
+  cs := make(chan wemo.SubscriptionEvent)
+
+  go wemo.Listener(listenerAddress, cs)
+
+  for m := range cs{
+    if _, ok := subscriptions[m.Sid]; ok {
+      subscriptions[m.Sid].State = m.State
+      log.Println("---Subscriber Event: ", subscriptions[m.Sid])
+    } else {
+      log.Println("Does'nt exist, ", m.Sid)
+    }
+  }
+
+}
+```
+
+Device info can be found at:
+http://192.168.1.25:49153/setup.xml

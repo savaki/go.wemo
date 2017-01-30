@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -22,11 +23,12 @@ import (
 
 var ipAddrRE = regexp.MustCompile(`^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/\d{1,3}$`)
 
-func NewByIp(ipAddr string) *Wemo {
+// NewByIP ...
+func NewByIP(ipAddr string) *Wemo {
 	return &Wemo{ipAddr: ipAddr, Debug: false}
 }
 
-// find the ip address associated with the specified interface
+// NewByInterface find the ip address associated with the specified interface
 func NewByInterface(name string) (*Wemo, error) {
 	// find the interface with the selected name
 	iface, err := net.InterfaceByName(name)
@@ -45,7 +47,7 @@ func NewByInterface(name string) (*Wemo, error) {
 	// and find the one that looks like an IPv4 address
 	for _, addr := range addrs {
 		if matches := ipAddrRE.FindStringSubmatch(addr.String()); len(matches) == 2 {
-			return NewByIp(matches[1]), nil
+			return NewByIP(matches[1]), nil
 		}
 	}
 

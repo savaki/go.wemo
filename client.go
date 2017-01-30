@@ -1,3 +1,4 @@
+// Package wemo ...
 // Copyright 2014 Matt Ho
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +20,8 @@ import (
 	"time"
 )
 
-var client *http.Client = newTimeoutClient(2*time.Second, 2*time.Second)
+//var client *http.Client = newTimeoutClient(2*time.Second, 2*time.Second)
+var client = newTimeoutClient(2*time.Second, 2*time.Second)
 
 func timeoutDialer(connectTimeout time.Duration, readWriteTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {
 	return func(netw, addr string) (net.Conn, error) {
