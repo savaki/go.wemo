@@ -2,13 +2,18 @@ package main
 
 import (
 	"github.com/codegangsta/cli"
-	"github.com/savaki/go.wemo"
+	"github.com/andrewpurkett/go.wemo"
 )
 
 var onCommand = cli.Command{
 	Name: "on",
 	Flags: []cli.Flag{
-		cli.StringFlag{"host", "", "device host and ip e.g. 10.0.1.2:49128", ""},
+		cli.StringFlag{
+			Name: "host",
+			Value: "",
+			Usage: "device host and ip e.g. 10.0.1.2:49128",
+			EnvVar: "WEMO_POWER_HOST",
+		},
 	},
 	Action: onAction,
 }
@@ -24,7 +29,12 @@ func onAction(c *cli.Context) {
 var offCommand = cli.Command{
 	Name: "off",
 	Flags: []cli.Flag{
-		cli.StringFlag{"host", "", "device host and ip e.g. 10.0.1.2:49128", ""},
+		cli.StringFlag{
+			Name: "host",
+			Value: "",
+			Usage: "device host and ip e.g. 10.0.1.2:49128",
+			EnvVar: "WEMO_POWER_HOST",
+		},
 	},
 	Action: offAction,
 }
@@ -40,7 +50,12 @@ func offAction(c *cli.Context) {
 var toggleCommand = cli.Command{
 	Name: "toggle",
 	Flags: []cli.Flag{
-		cli.StringFlag{"host", "", "device host and ip e.g. 10.0.1.2:49128", ""},
+		cli.StringFlag{
+			Name: "host",
+			Value: "",
+			Usage: "device host and ip e.g. 10.0.1.2:49128",
+			EnvVar: "WEMO_POWER_HOST",
+		},
 	},
 	Action: toggleAction,
 }

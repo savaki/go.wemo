@@ -46,7 +46,7 @@ func TestParseResponseXML(t *testing.T) {
     <serialNumber>221248K0102C92</serialNumber>
     <UDN>uuid:Socket-1_0-221248K0102C92</UDN>
     <UPC>123456789</UPC>
-    <macAddress>EC1A5974B1EC</macAddress>
+    <macAddress>EC1A5974B1EB</macAddress>
     <firmwareVersion>WeMo_US_2.00.2769.PVT</firmwareVersion>
     <iconVersion>0|49153</iconVersion>
     <binaryState>1</binaryState>

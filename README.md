@@ -1,10 +1,49 @@
 go.wemo
 =======
 
-[![GoDoc](http://godoc.org/github.com/savaki/go.wemo?status.png)](http://godoc.org/github.com/savaki/go.wemo)
-[![Build Status](https://snap-ci.com/savaki/go.wemo/branch/master/build_image)](https://snap-ci.com/savaki/go.wemo/branch/master)
+[![GoDoc](http://godoc.org/github.com/andrewpurkett/go.wemo?status.png)](http://godoc.org/github.com/andrewpurkett/go.wemo)
 
 Simple package to interface with Belkin wemo devices.
+
+## Standalone Usage Guide
+
+Install the go library and configure it as needed, ensuring `~/bin/go/src/` is in your `GOPATH` environment variable. 
+
+Run the following command from `~/bin/go/src/`:
+
+`go get https://github.com/andrewpurkett/go.wemo`
+
+navigate into the new directory:
+
+`cd ~/bin/go/src/github.com/andrewpurkett/go.wemo`
+
+To use this fork, run `git checkout forktest`, now, to avoid any conflicts.
+
+Run `go get` to retrieve dependencies
+
+navigate into the example usage directory:
+
+`cd ~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo`
+
+Run `go get` again to retrieve dependencies for the example usage directory
+
+Build the example usage tool:
+
+`go build`
+
+Then refer to the command line tool to see sample usage:
+ 
+`~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo/wemo`
+
+`~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo/wemo discover -h`
+
+![Example usage](https://i.imgur.com/UYI2E4F.png)
+
+If you were unable to build the CLI tool, run `go test` (in both `~/bin/go/src/github.com/andrewpurkett/go.wemo/wemo` and `~/bin/go/src/github.com/andrewpurkett/go.wemo/`), check your `GOPATH`, `GOROOT`, and repeat any other golang setup steps required.
+
+## Utilizing the library in projects
+
+Here is some example usage of the various functionality incorporated in this go repository:
 
 ### Example - Device discovery
 
@@ -13,7 +52,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/savaki/go.wemo"
+	"github.com/andrewpurkett/go.wemo"
 	"time"
 )
 
@@ -33,7 +72,7 @@ package main
 
 import (
   "fmt"
-  "github.com/savaki/go.wemo"
+  "github.com/andrewpurkett/go.wemo"
 )
 
 func main() {
@@ -61,7 +100,7 @@ As a convenience method, you can control lights through a more generic interface
 package main
 
 import (
-  "github.com/savaki/go.wemo"
+  "github.com/andrewpurkett/go.wemo"
   "time"
 )
 

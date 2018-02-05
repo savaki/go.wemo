@@ -22,7 +22,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "wemo"
 	app.Usage = "command line interface wemo"
-	app.Version = "0.1"
+	app.Version = "0.2"
 	app.Commands = []cli.Command{
 		discoverCommand,
 		onCommand,
