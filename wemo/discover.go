@@ -3,7 +3,7 @@ package main
 import (
 	"code.google.com/p/go.net/context"
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/savaki/go.wemo"
 	"log"
 	"sort"
