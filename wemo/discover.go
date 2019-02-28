@@ -3,7 +3,7 @@ package main
 import (
 	"code.google.com/p/go.net/context"
 	"fmt"
-	"github.com/codegangsta/cli"
+	"github.com/urfave/cli"
 	"github.com/savaki/go.wemo"
 	"log"
 	"sort"
@@ -15,9 +15,10 @@ var discoverCommand = cli.Command{
 	Usage:       "find devices in the local network",
 	Description: "search for devices in the local network",
 	Flags: []cli.Flag{
-		cli.StringFlag{"interface", "", "search by interface", ""},
-		cli.StringFlag{"ip", "", "discovery wemo by ip", ""},
-		cli.IntFlag{"timeout", 3, "timeout", ""},
+		cli.StringFlag{
+			Name: "interface", Value: "", Usage: "search by interface"},
+		cli.StringFlag{Name: "ip", Value: "", Usage: "discovery wemo by ip"},
+		cli.IntFlag{Name: "timeout", Value: 3, Usage: "timeout"},
 	},
 	Action: commandAction,
 }
