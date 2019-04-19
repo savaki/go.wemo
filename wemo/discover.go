@@ -1,7 +1,7 @@
 package main
 
 import (
-	"code.google.com/p/go.net/context"
+	"context"
 	"fmt"
 	"github.com/codegangsta/cli"
 	"github.com/savaki/go.wemo"

@@ -14,16 +14,17 @@
 package wemo
 
 import (
-	"code.google.com/p/go.net/context"
+	"context"
 	"encoding/xml"
 	"errors"
 	"fmt"
-	"github.com/savaki/httpctx"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"regexp"
 	"strconv"
+
+	"golang.org/x/net/context/ctxhttp"
 )
 
 type Device struct {
@@ -65,15 +66,18 @@ func unmarshalDeviceInfo(data []byte) (*DeviceInfo, error) {
 }
 
 func (d *Device) FetchDeviceInfo(ctx context.Context) (*DeviceInfo, error) {
-	var data []byte
-
 	uri := fmt.Sprintf("http://%s/setup.xml", d.Host)
-	err := httpctx.NewClient().Get(ctx, uri, nil, &data)
+
+	resp, err := ctxhttp.Get(ctx, nil, uri)
 	if err != nil {
 		return nil, err
 	}
-
-	deviceInfo, err := unmarshalDeviceInfo(data)
+	defer resp.Body.Close()
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	deviceInfo, err := unmarshalDeviceInfo(body)
 	if err != nil {
 		return nil, err
 	}
